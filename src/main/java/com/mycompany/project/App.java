@@ -7,17 +7,21 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 
 public class App extends Application {
     @Override
-    public void start(Stage stage) {
+    public void start(@SuppressWarnings("exports") Stage stage) {
         BorderPane bP=new BorderPane();
         
         Button btnNewGame=new Button("New Game");
@@ -43,18 +47,19 @@ public class App extends Application {
         hBottom.setAlignment(Pos.BOTTOM_CENTER);
 
         GridPane gridP=new GridPane();
-        gridP.setHgap(30);
-        gridP.setVgap(30);
+        gridP.setHgap(2);
+        gridP.setVgap(2);
+        gridP.setAlignment(Pos.CENTER);
         gridP.setPadding(new Insets(10));
-        TextField[][] textFields=new TextField[9][9];
         for (int i = 0; i < 9; i++) {
             for(int j = 0; j < 9; j++){
-                TextField textField=new TextField();
-                textField.setPrefHeight(40);
-                textField.setPrefWidth(40);
-                textField.setAlignment(Pos.CENTER);
-                gridP.add(textField, i, j);
-                textFields[i][j]=textField;
+                Rectangle cell=new Rectangle(40, 40);
+                cell.setFill(Color.TRANSPARENT);
+                cell.setStroke(Color.BLACK);
+                Text text=new Text("");
+                text.setFont(Font.font(20));
+                StackPane stackP=new StackPane(cell, text);
+                gridP.add(stackP, i, j);
             }
         }
 
