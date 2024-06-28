@@ -3,72 +3,149 @@ package com.mycompany.project;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 
 public class App extends Application {
-    @Override
-    public void start(@SuppressWarnings("exports") Stage stage) {
-        BorderPane bP=new BorderPane();
-        
-        Button btnNewGame=new Button("New Game");
-        Button btnSize=new Button("Size");
-        Button btnMode=new Button("Mode Play");
-        Group grHeaderBtn = new Group(btnMode, btnNewGame, btnSize);
-        HBox hHeaderBtn=new HBox(10);
-        hHeaderBtn.setAlignment(Pos.TOP_CENTER);
-        hHeaderBtn.getChildren().addAll(btnNewGame, btnMode, btnSize);
+    private static final int SIZE=9;
+    private static final int SUBGRID_SIZE=3;
+    private static final int CELL_SIZE=60;
 
-        Label lblScore=new Label("Score:   ");
-        Label lblTime=new Label("Timer:   ");
-        Group grHeaderLbl=new Group(lblScore, lblTime);
-        HBox hHeaderlbl=new HBox(50);
-        hHeaderlbl.setAlignment(Pos.TOP_LEFT);
-        hHeaderlbl.getChildren().addAll(lblScore, lblTime);
-
-        Button btnHint=new Button("Hint");
-        Button btnDelete=new Button("Delete");
-        Button btnUndo=new Button("Undo");
-        Group grBottomBtn=new Group(btnDelete, btnHint, btnUndo);
-        HBox hBottom=new HBox(grBottomBtn);
-        hBottom.setAlignment(Pos.BOTTOM_CENTER);
-
+    private GridPane createSudokuGrid(){
         GridPane gridP=new GridPane();
-        gridP.setHgap(2);
-        gridP.setVgap(2);
-        gridP.setAlignment(Pos.CENTER);
-        gridP.setPadding(new Insets(10));
-        for (int i = 0; i < 9; i++) {
-            for(int j = 0; j < 9; j++){
-                Rectangle cell=new Rectangle(40, 40);
-                cell.setFill(Color.TRANSPARENT);
-                cell.setStroke(Color.BLACK);
-                Text text=new Text("");
-                text.setFont(Font.font(20));
-                StackPane stackP=new StackPane(cell, text);
-                gridP.add(stackP, i, j);
+        gridP.setGridLinesVisible(true);
+        for(int i = 0; i < SIZE; i++){
+            for(int j = 0; j < SIZE; j++){
+                StackPane cell=createCell(i, j);
+                gridP.add(cell, j, i);
             }
         }
+        return gridP;
+    }
 
-        VBox headerBox=new VBox(10);
-        headerBox.getChildren().addAll(hHeaderBtn, hHeaderlbl);
-        bP.setTop(headerBox);
-        bP.setCenter(gridP);
+    private StackPane createCell(int i, int j){
+        StackPane stackP=new StackPane();
+        TextField textField=new TextField();
+        textField.setPrefSize(CELL_SIZE, CELL_SIZE);
+        textField.setAlignment(Pos.CENTER);
+        textField.setFont(Font.font(20));
+        textField.setStyle("-fx-background-color: white; -fx-border-color: black; -fx-border-width: 0.5;");
+        if((i / SUBGRID_SIZE + j /SUBGRID_SIZE) % 2 == 0 ) {
+            textField.setStyle("-fx-background-color: lightgray; -fx-border-color: black; -fx-border-width: 0.5;");
+        }
+        stackP.getChildren().add(textField);
+        return stackP;
+    }
 
-        Scene scene=new Scene(bP, 400, 400);
+    private VBox createControlPanel(){
+        VBox controlPanel=new VBox(20);
+        controlPanel.setAlignment(Pos.TOP_CENTER);
+        controlPanel.setPrefWidth(200);
+
+        Button btnUndo=new Button("Undo");
+        Button btnDelete=new Button("Delete");
+        Button btnNote=new Button("Note");
+        Button btnHint=new Button("Hint");
+
+        btnUndo.setPrefWidth(100);
+        btnDelete.setPrefWidth(100);
+        btnNote.setPrefWidth(100);
+        btnHint.setPrefWidth(100);
+
+        GridPane numberPad=createNumberPad();
+        controlPanel.getChildren().add(numberPad);
+        
+        Button btnNew=new Button("NEW GAME");
+        btnNew.setPrefWidth(200);
+
+        controlPanel.getChildren().addAll(btnUndo, btnDelete, btnNote, btnHint, btnNew);
+        return controlPanel;
+    }
+
+    private GridPane createNumberPad(){
+        GridPane numberPad = new GridPane();
+        numberPad.setHgap(10);
+        numberPad.setVgap(10);
+
+        for (int i = 1; i <= 9; i++) {
+            Button numberButton = new Button(String.valueOf(i));
+            numberButton.setPrefSize(50, 50);
+            numberButton.setFont(Font.font(18));
+            numberPad.add(numberButton, (i - 1) % 3, (i - 1) / 3);
+        }
+        return numberPad;
+    }
+
+    private HBox createControlHeader(){
+        HBox header=new HBox(20);
+        header.setAlignment(Pos.TOP_LEFT);
+
+        Label mode=new Label("Mode:");
+        Button btnEasy=new Button("Easy");
+        Button btnMed=new Button("Medium");
+        Button btnHard=new Button("Hard");
+        Button btnEx=new Button("Expert");
+        Button btnMas=new Button("Master");
+        Button btnEXtr=new Button("Extremely");
+
+        btnEasy.setPrefWidth(100);
+        btnMed.setPrefWidth(100);
+        btnHard.setPrefWidth(100);
+        btnEx.setPrefWidth(100);
+        btnMas.setPrefWidth(100);
+        btnEXtr.setPrefWidth(100);
+
+        header.getChildren().addAll(mode, btnEasy, btnMed, btnHard, btnEx, btnMas, btnEXtr);
+        return header;
+    }
+
+    @Override
+    public void start(Stage stage) {
+        GridPane suGrid= createSudokuGrid();
+        VBox controlPanel=createControlPanel();
+        HBox controlHeader=createControlHeader();
+        
+        Label lblMis=new Label("Mistake:   ");
+        Label lblScore=new Label("Score:   ");
+        Label lblTime=new Label("Timer:   ");
+        //Group grHeaderLbl=new Group(lblScore, lblTime);
+        HBox hHeaderlbl=new HBox(50);
+        hHeaderlbl.setAlignment(Pos.TOP_RIGHT);
+        hHeaderlbl.getChildren().addAll(lblMis, lblScore, lblTime);
+        hHeaderlbl.setMargin(lblMis, new Insets(0, 50, 0, 0));
+        hHeaderlbl.setMargin(lblScore, new Insets(0, 50, 0, 0));
+        hHeaderlbl.setMargin(lblTime, new Insets(0, 70, 0, 0));
+    
+        HBox root=new HBox(20, suGrid, controlHeader, controlPanel);
+        root.setPadding(new Insets(20));
+        root.setAlignment(Pos.CENTER);
+        VBox maincontainer=new VBox(20, controlHeader, root, hHeaderlbl);
+
+        maincontainer.setPadding(new Insets(20));
+        maincontainer.setAlignment(Pos.CENTER);
+
+        VBox.setMargin(controlHeader, new Insets(0, 0, 0, 0));
+
+        Button btnToggleFullscreen=new Button("Fullscreen");
+        btnToggleFullscreen.setOnAction(e -> {
+            stage.setFullScreen(!stage.isFullScreen());
+        });
+
+        maincontainer.getChildren().add(btnToggleFullscreen);
+        VBox.setMargin(btnToggleFullscreen, new Insets(0, 0, 0, 0));
+
+        Scene scene=new Scene(maincontainer, 800, 600);
+        stage.setTitle("SUDOKU");
+        stage.setResizable(false);
         stage.setScene(scene);
         stage.show();
     }
@@ -76,5 +153,5 @@ public class App extends Application {
      public static void main(String[] args) {
             launch(args);
         
-        };
+    };
 }
