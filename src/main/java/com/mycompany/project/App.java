@@ -20,8 +20,22 @@ public class App extends Application {
     private static final int SUBGRID_SIZE=3;
     private static final int CELL_SIZE=60;
 
+    private Button btnEasy;
+    private Button btnMed;
+    private Button btnHard;
+    private Button btnEx;
+    private Button btnMas;
+    private Button btnEXtr;
+
+    private Label lblMis;
+    private Label lblScore;
+    private Label lblTime;
+
+    private TextField textField;
+    private GridPane gridP;
+    
     private GridPane createSudokuGrid(){
-        GridPane gridP=new GridPane();
+        gridP=new GridPane();
         gridP.setGridLinesVisible(true);
         for(int i = 0; i < SIZE; i++){
             for(int j = 0; j < SIZE; j++){
@@ -34,7 +48,7 @@ public class App extends Application {
 
     private StackPane createCell(int i, int j){
         StackPane stackP=new StackPane();
-        TextField textField=new TextField();
+        textField=new TextField();
         textField.setPrefSize(CELL_SIZE, CELL_SIZE);
         textField.setAlignment(Pos.CENTER);
         textField.setFont(Font.font(20));
@@ -90,12 +104,12 @@ public class App extends Application {
         header.setAlignment(Pos.TOP_LEFT);
 
         Label mode=new Label("Mode:");
-        Button btnEasy=new Button("Easy");
-        Button btnMed=new Button("Medium");
-        Button btnHard=new Button("Hard");
-        Button btnEx=new Button("Expert");
-        Button btnMas=new Button("Master");
-        Button btnEXtr=new Button("Extremely");
+        btnEasy=new Button("Easy");
+        btnMed=new Button("Medium");
+        btnHard=new Button("Hard");
+        btnEx=new Button("Expert");
+        btnMas=new Button("Master");
+        btnEXtr=new Button("Extremely");
 
         btnEasy.setPrefWidth(100);
         btnMed.setPrefWidth(100);
@@ -114,9 +128,9 @@ public class App extends Application {
         VBox controlPanel=createControlPanel();
         HBox controlHeader=createControlHeader();
         
-        Label lblMis=new Label("Mistake:   ");
-        Label lblScore=new Label("Score:   ");
-        Label lblTime=new Label("Timer:   ");
+        lblMis=new Label("Mistake: 0/3");
+        lblScore=new Label("Score: 0");
+        lblTime=new Label("Timer: 00:00");
         //Group grHeaderLbl=new Group(lblScore, lblTime);
         HBox hHeaderlbl=new HBox(50);
         hHeaderlbl.setAlignment(Pos.TOP_RIGHT);
@@ -150,6 +164,11 @@ public class App extends Application {
         stage.show();
     }
 
+
+    //Handle Event
+    public void updateTimerLabel(String time) {
+        lblTime.setText(time);
+    }
      public static void main(String[] args) {
             launch(args);
         
