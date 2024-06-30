@@ -1,5 +1,6 @@
 package com.mycompany.project;
 import java.util.Optional;
+import java.util.Random;
 import java.util.Stack;
 
 import javafx.geometry.Pos;
@@ -8,9 +9,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
 public class SudokuPanel{
@@ -23,6 +22,7 @@ public class SudokuPanel{
     private TextField[][] cells = new TextField[SIZE][SIZE];
     private GridPane gridP;
     private int mistake;
+    private int hint;
     private SudokuGenerator generator = new SudokuGenerator();
     private SudokuPuzzle puzzle = generator.generateRandomSudoku(SudokuPuzzleType.NINEBYNINE, "Medium");
     private final Stack<int[]> moveHistory = new Stack<>();
@@ -38,7 +38,6 @@ public class SudokuPanel{
     public GridPane createSudokuGrid() {
         gridP = new GridPane();
         gridP.setGridLinesVisible(false);
-        
         for (int row = 0; row < SIZE; row++) {
             for (int col = 0; col < SIZE; col++) {
                 String value = puzzle.getValue(row, col);
@@ -65,7 +64,7 @@ public class SudokuPanel{
         textField.setPrefSize(CELL_SIZE, CELL_SIZE);
         textField.setAlignment(Pos.CENTER);
         textField.setFont(Font.font(20));
-        textField.setStyle("-fx-background-color: white; -fx-border-color: black; -fx-border-width: 0.4;");
+        textField.setStyle("-fx-background-color: white; -fx-border-color: black; -fx-border-width: 0.4;-fx-text-fill: black;");
         // // Sự kiện MouseEvent để điều khiển màu nền khi chọn
         // textField.addEventFilter(MouseEvent.MOUSE_ENTERED, event -> {
         //     if (textField.isEditable()) {
@@ -95,13 +94,79 @@ public class SudokuPanel{
         alert.setContentText(message);
         alert.showAndWait();
     }
-    
+    public void resetMoveHistory() {
+        moveHistory.clear();
+    }
+    public void resetHint(){
+        this.hint = 0;
+        if (appUI != null) {
+            appUI.updateHint(hint);
+        }
+    }
+    public void resetMistakes() {
+        this.mistake = 0;
+        if (appUI != null) {
+            appUI.updateMistakeLabel(mistake);
+        }
+    }
     //Event
+    public void autoFill(){
+        Stack<int[]> emptySlots = puzzle.emptySlot();
+        if (hint >= 5){
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.initOwner(appUI.getBtnHint().getScene().getWindow());
+            alert.setTitle("Thông báo");
+            alert.setHeaderText(null);
+            alert.setContentText("Đã hết số lần gợi ý");
+            alert.showAndWait();
+        }
+        if (currentlySelectedRow != -1 && currentlySelectedCol != -1) {
+            currentlySelectedRow = -1;
+            currentlySelectedCol = -1;
+        }
+
+        Random rand = new Random();
+        String[][] solution = puzzle.getSolution();
+        while (!emptySlots.isEmpty()) {
+            int randomIndex = rand.nextInt(emptySlots.size());
+            int[] emptySlot = emptySlots.remove(randomIndex); 
     
+            int row = emptySlot[0];
+            int col = emptySlot[1];
+    
+            String value = solution[row][col];
+    
+            if (puzzle.isValidMove(row, col, value) && hint < 5) {
+                cells[row][col].setText(value);
+                cells[row][col].setStyle("-fx-background-color: white; -fx-border-color: black; -fx-border-width: 0.4; -fx-text-fill: #FFD700;");
+                puzzle.board[row][col] = value;
+                hint++;
+                appUI.updateHint(hint);
+                return; 
+            }
+        }
+    }
+    public void deleteValue() {
+        if (currentlySelectedRow != -1 && currentlySelectedCol != -1) {
+            if (puzzle.getBoard()[currentlySelectedRow][currentlySelectedCol].equals("")) {
+                showAlert("Thông báo", "Cell trống", AlertType.INFORMATION);
+            } else {
+                if (!cells[currentlySelectedRow][currentlySelectedCol].getStyle().contains("-fx-text-fill: black")) {
+                    puzzle.getBoard()[currentlySelectedRow][currentlySelectedCol] = "";
+                    cells[currentlySelectedRow][currentlySelectedCol].setText("");
+                } else {
+                    showAlert("Thông báo", "Cell đề bài", AlertType.INFORMATION);
+                }
+            }
+            // Assuming repaint() is used to refresh the UI in Swing context; adjust as needed for JavaFX
+        } else {
+            showAlert("Thông báo", "Chưa chọn ô để xóa", AlertType.INFORMATION);
+        }
+    }
     public void gameOver(int mistake){
             if (mistake == 3) {
                 showAlert("GameOver", "You make 3/3 mistakes", AlertType.WARNING);
-                playAgain();
+                playAgain(appUI.getMode());
                 this.mistake = 0; // Reset mistake
                 if (appUI != null) {
                     appUI.updateMistakeLabel(this.mistake); 
@@ -109,8 +174,9 @@ public class SudokuPanel{
         }
     }
 
-    public void playAgain() {
-        SudokuPuzzle newPuzzle = new SudokuGenerator().generateRandomSudoku(SudokuPuzzleType.NINEBYNINE, "Medium");
+    public void playAgain(String mode) {
+        System.err.println(mode);
+        SudokuPuzzle newPuzzle = new SudokuGenerator().generateRandomSudoku(SudokuPuzzleType.NINEBYNINE, mode);
         newSudokuPuzzle(newPuzzle);
         currentlySelectedCol = -1;
         currentlySelectedRow = -1;
@@ -130,7 +196,7 @@ public class SudokuPanel{
 
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == playAgainButton) {
-                playAgain();
+                playAgain(appUI.getMode());
             } else {
                 System.exit(0);
             }

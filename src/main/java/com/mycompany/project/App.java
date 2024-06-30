@@ -11,22 +11,16 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
+
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 
 public class App extends Application {
-    private static final int SIZE=9;
-    private static final int SUBGRID_SIZE=3;
-    private static final int CELL_SIZE=50;
+    private String mode = "Medium";
 
     private Button btnEasy;
     private Button btnMed;
@@ -35,11 +29,17 @@ public class App extends Application {
     private Button btnMas;
     private Button btnEXtr;
 
+    private Button btnUndo;
+    private Button btnDelete;
+    private Button btnNote;
+    private Button btnHint;
+    private Button btnNew;
+
     private Label lblMis;
     private Label lblScore;
     private Label lblTime;
+    private Label lblHint;
 
-    private TextField[][] cells = new TextField[SIZE][SIZE];
     private GridPane suGrid;
     private SudokuPanel sudokuPanel = new SudokuPanel();
 
@@ -50,24 +50,18 @@ public class App extends Application {
     private boolean timerIsRunning = false;
     private Timeline timer;
 
-    public GridPane getSuGrid() {
-        return suGrid;
-    }
-
-    public void setSuGrid(GridPane suGrid) {
-        this.suGrid = suGrid;
-    }
-
     private VBox createControlPanel(){
         VBox controlPanel=new VBox(20);
         controlPanel.setAlignment(Pos.TOP_CENTER);
         controlPanel.setPrefWidth(200);
 
-        Button btnUndo=new Button("Undo");
-        Button btnDelete=new Button("Delete");
-        Button btnNote=new Button("Note");
-        Button btnHint=new Button("Hint");
+        btnUndo=new Button("Undo");
+        btnDelete=new Button("Delete");
+        btnNote=new Button("Note");
+        btnHint=new Button("Hint");
+        btnNew=new Button("NEW GAME");
 
+        btnNew.setPrefWidth(200);
         btnUndo.setPrefWidth(100);
         btnDelete.setPrefWidth(100);
         btnNote.setPrefWidth(100);
@@ -76,8 +70,9 @@ public class App extends Application {
         GridPane numberPad=createNumberPad();
         controlPanel.getChildren().add(numberPad);
         
-        Button btnNew=new Button("NEW GAME");
-        btnNew.setPrefWidth(200);
+        
+       
+        
 
         controlPanel.getChildren().addAll(btnUndo, btnDelete, btnNote, btnHint, btnNew);
         return controlPanel;
@@ -117,17 +112,13 @@ public class App extends Application {
         btnMas.setPrefWidth(100);
         btnEXtr.setPrefWidth(100);
 
-        btnEasy.setOnAction(event -> showConfirmationDialog("Easy"));
-        btnMed.setOnAction(event -> showConfirmationDialog("Medium"));
-        btnHard.setOnAction(event -> showConfirmationDialog("Hard"));
-        btnEx.setOnAction(event -> showConfirmationDialog("Expert"));
-        btnMas.setOnAction(event -> showConfirmationDialog("Master"));
-        btnEXtr.setOnAction(event -> showConfirmationDialog("Extremely"));
+        
         
         header.getChildren().addAll(mode, btnEasy, btnMed, btnHard, btnEx, btnMas, btnEXtr);
         return header;
     }
 
+    @SuppressWarnings("exports")
     @Override
     public void start(Stage stage) {
         suGrid = sudokuPanel.createSudokuGrid();
@@ -137,13 +128,14 @@ public class App extends Application {
         lblMis=new Label("Mistake: 0/3");
         lblScore=new Label("Score: 0");
         lblTime=new Label("Timer: 00:00");
+        lblHint = new Label("Hint: 0/5");
         //Group grHeaderLbl=new Group(lblScore, lblTime);
         HBox hHeaderlbl=new HBox(50);
         hHeaderlbl.setAlignment(Pos.TOP_RIGHT);
-        hHeaderlbl.getChildren().addAll(lblMis, lblScore, lblTime);
-        hHeaderlbl.setMargin(lblMis, new Insets(0, 50, 0, 0));
-        hHeaderlbl.setMargin(lblScore, new Insets(0, 50, 0, 0));
-        hHeaderlbl.setMargin(lblTime, new Insets(0, 70, 0, 0));
+        hHeaderlbl.getChildren().addAll(lblHint, lblMis, lblScore, lblTime);
+        HBox.setMargin(lblMis, new Insets(0, 50, 0, 0));
+        HBox.setMargin(lblScore, new Insets(0, 50, 0, 0));
+        HBox.setMargin(lblTime, new Insets(0, 70, 0, 0));
     
         root=new HBox(20, suGrid, controlHeader, controlPanel);
         root.setPadding(new Insets(20));
@@ -163,19 +155,58 @@ public class App extends Application {
         maincontainer.getChildren().add(btnToggleFullscreen);
         VBox.setMargin(btnToggleFullscreen, new Insets(0, 0, 0, 0));
 
-        initializeTimer();
-        startTimer();
         Scene scene=new Scene(maincontainer, 800, 600);
         stage.setTitle("SUDOKU");
         stage.setResizable(false);
         stage.setScene(scene);
         stage.show();
         sudokuPanel.setAppUI(this);
-        
+        initializeTimer();
+        startTimer();
+        handleButtonClick();
+    }
+    //Getter Setter
+    @SuppressWarnings("exports")
+    public GridPane getSuGrid() {
+        return suGrid;
     }
 
+    @SuppressWarnings("exports")
+    public void setSuGrid(GridPane suGrid) {
+        this.suGrid = suGrid;
+    }
+    
+    @SuppressWarnings("exports")
+    public Button getBtnHint() {
+        return btnHint;
+    }
+
+    @SuppressWarnings("exports")
+    public void setBtnHint(Button btnHint) {
+        this.btnHint = btnHint;
+    }
+    
+    public String getMode() {
+        return mode;
+    }
+
+    public void setMode(String mode) {
+        this.mode = mode;
+    }
 
     //Handle Event
+    private void handleButtonClick(){
+        btnEasy.setOnAction(event -> showConfirmationDialog("Easy"));
+        btnMed.setOnAction(event -> showConfirmationDialog("Medium"));
+        btnHard.setOnAction(event -> showConfirmationDialog("Hard"));
+        btnEx.setOnAction(event -> showConfirmationDialog("Expert"));
+        btnMas.setOnAction(event -> showConfirmationDialog("Master"));
+        btnEXtr.setOnAction(event -> showConfirmationDialog("Extremely"));
+
+        btnDelete.setOnAction(event -> sudokuPanel.deleteValue());
+        btnHint.setOnAction(event -> sudokuPanel.autoFill());
+        btnNew.setOnAction(event -> sudokuPanel.playAgain(this.mode));
+    }
     private void showConfirmationDialog(String mode) {
         Alert alert = new Alert(AlertType.CONFIRMATION);
         alert.setTitle("Change Puzzle Mode");
@@ -185,6 +216,8 @@ public class App extends Application {
         alert.showAndWait().ifPresent(response -> {
             if (response == javafx.scene.control.ButtonType.OK) {
                 // Clear current data and generate new puzzle based on mode
+                this.mode = mode;
+                System.out.println(mode);
                 rebuildMode(mode);
             }
         });
@@ -238,6 +271,11 @@ public class App extends Application {
         root.getChildren().remove(0);
         root.getChildren().add(0, suGrid);
         // Cập nhật lại các thành phần điều khiển khác nếu cần
+        resetTimer();
+        startTimer();
+        sudokuPanel.resetMoveHistory();
+        sudokuPanel.resetHint();
+        sudokuPanel.resetMistakes();
         // Đặt lại gridP vào giao diện người dùng
     }
     public void rebuildMode(String mode){
@@ -248,10 +286,20 @@ public class App extends Application {
         suGrid = sudokuPanel.createSudokuGrid();
         root.getChildren().remove(0);
         root.getChildren().add(0, suGrid);
+        // Cập nhật lại các thành phần điều khiển khác nếu cần
+        resetTimer();
+        startTimer();
+        sudokuPanel.resetMoveHistory();
+        sudokuPanel.resetHint();
+        sudokuPanel.resetMistakes();
     }
     public void updateMistakeLabel(int mistakes) {
         lblMis.setText("Mistakes: " + mistakes + "/3");
     }
+    public void updateHint(int hint){
+        lblHint.setText("Hint: " + hint + "/5");
+    }
+    
     public static void main(String[] args) {
             launch(args);
         
