@@ -33,9 +33,12 @@ public class SudokuGenerator {
                 numberOfValuesToKeep = (int) (
 					switch (mode) 
 					{
-						case "Easy" -> 0.7777777777*(copy.getNumRows()*copy.getNumRows());
+						case "Easy" -> 0.8888888888*(copy.getNumRows()*copy.getNumRows());
 						case "Medium" -> 0.5555555555*(copy.getNumRows()*copy.getNumRows());
-						default -> 0.3333333333*(copy.getNumRows()*copy.getNumRows());
+						case "Expert" -> 0.4444444444*(copy.getNumRows()*copy.getNumRows());
+						case "Master" -> 0.3333333333*(copy.getNumRows()*copy.getNumRows());
+						case "Extremely" -> 0.2222222222*(copy.getNumRows()*copy.getNumRows());
+						default -> 0.5555555555*(copy.getNumRows()*copy.getNumRows());
        				});
            
 		//random row and randow col to fill number
@@ -49,6 +52,7 @@ public class SudokuGenerator {
 		}
 		return puzzle;
 	}
+
 	/**
 	 * Solves the Sudoku puzzle
 	 * @param r: the current row
