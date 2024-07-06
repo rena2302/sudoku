@@ -135,7 +135,7 @@ public class SudokuPanel{
                 } else if (cell.getStyle().contains("-fx-text-fill: #FFD700")) {
                     textColor = "-fx-text-fill: #FFD700;";
                 }
-                
+    
                 if (value.isEmpty()) {
                     cell.setStyle("-fx-background-color: white; -fx-border-color: lightgray; -fx-border-width: 0.4;" + textColor);
                 } else {
@@ -144,22 +144,47 @@ public class SudokuPanel{
             }
         }
     
-        // Highlight the selected cell and its row and column
+        // Highlight the selected cell, its row, column, block, and cells with the same value
         if (currentlySelectedRow != -1 && currentlySelectedCol != -1) {
+            String selectedValue = cells[currentlySelectedRow][currentlySelectedCol].getText();
+    
+            // Highlight row and column
             for (int i = 0; i < SIZE; i++) {
-                updateCellBackground(cells[currentlySelectedRow][i], "rgba(0, 0, 255, 0.3)");
-                updateCellBackground(cells[i][currentlySelectedCol], "rgba(0, 0, 255, 0.3)");
+                updateCellBackground(cells[currentlySelectedRow][i], "rgba(0, 0, 255, 0.1)");
+                updateCellBackground(cells[i][currentlySelectedCol], "rgba(0, 0, 255, 0.1)");
             }
-            updateCellBackground(cells[currentlySelectedRow][currentlySelectedCol], "rgba(0, 0, 255, 0.5)");
+    
+            // Highlight block
+            int blockRowStart = (currentlySelectedRow / 3) * 3;
+            int blockColStart = (currentlySelectedCol / 3) * 3;
+            for (int row = blockRowStart; row < blockRowStart + 3; row++) {
+                for (int col = blockColStart; col < blockColStart + 3; col++) {
+                    updateCellBackground(cells[row][col], "rgba(0, 0, 255, 0.1)");
+                }
+            }
+    
+            // Highlight cells with the same value
+            if (!selectedValue.isEmpty()) {
+                for (int row = 0; row < SIZE; row++) {
+                    for (int col = 0; col < SIZE; col++) {
+                        if (cells[row][col].getText().equals(selectedValue)) {
+                            updateCellBackground(cells[row][col], "rgba(0, 255, 0, 0.1)"); // Highlight cells with the same value
+                        }
+                    }
+                }
+            }
+    
+            // Highlight selected cell with a different color
+            updateCellBackground(cells[currentlySelectedRow][currentlySelectedCol], "rgba(0, 0, 255, 0.2)"); // Make selected cell slightly darker
         }
     }
     
     private void updateCellBackground(TextField cell, String backgroundColor) {
         String style = cell.getStyle();
         String textColor = style.contains("-fx-text-fill: red") ? "-fx-text-fill: red;" :
-                           style.contains("-fx-text-fill: blue") ? "-fx-text-fill: blue;" :
-                           style.contains("-fx-text-fill: #FFD700") ? "-fx-text-fill: #FFD700;" :
-                           style.contains("-fx-text-fill: black") ? "-fx-text-fill: black;" : "-fx-text-fill: white;";
+                          style.contains("-fx-text-fill: blue") ? "-fx-text-fill: blue;" :
+                          style.contains("-fx-text-fill: black") ? "-fx-text-fill: black;" :
+                          style.contains("-fx-text-fill: #FFD700") ? "-fx-text-fill: #FFD700;" : "-fx-text-fill: white;";
         cell.setStyle("-fx-background-color: " + backgroundColor + "; -fx-border-color: lightgray; -fx-border-width: 0.4;" + textColor);
     }
     private void showAlert(String title, String message, AlertType alertType) {
