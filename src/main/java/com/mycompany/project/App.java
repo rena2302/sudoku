@@ -155,7 +155,7 @@ public class App extends Application {
         maincontainer.getChildren().add(btnToggleFullscreen);
         VBox.setMargin(btnToggleFullscreen, new Insets(0, 0, 0, 0));
 
-        Scene scene=new Scene(maincontainer, 800, 600);
+        Scene scene=new Scene(maincontainer, 800, 800);
         stage.setTitle("SUDOKU");
         stage.setResizable(false);
         stage.setScene(scene);

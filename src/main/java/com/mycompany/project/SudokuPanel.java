@@ -9,12 +9,18 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
 public class SudokuPanel{
     private static final int SIZE=9;
-    private static final int CELL_SIZE=50;
+    private static final int CELL_SIZE=60;
 
     private App appUI;
     private int currentlySelectedCol = -1;
@@ -38,33 +44,59 @@ public class SudokuPanel{
     public GridPane createSudokuGrid() {
         gridP = new GridPane();
         gridP.setGridLinesVisible(false);
-        for (int row = 0; row < SIZE; row++) {
-            for (int col = 0; col < SIZE; col++) {
-                String value = puzzle.getValue(row, col);
-                cells[row][col] = new TextField();
-                setupTextField(cells[row][col]); // Gọi phương thức để chỉ cho phép nhập số
-                cells[row][col].setText(value);
-                cells[row][col].setPrefSize(50, 50);
-                cells[row][col].setAlignment(Pos.CENTER);
-                gridP.add(cells[row][col], col, row);
-                final int currentRow = row;
-                final int currentCol = col;
-                cells[row][col].setOnMouseClicked(event -> {
-                    currentlySelectedRow = currentRow;
-                    currentlySelectedCol = currentCol;
-                    // Cập nhật màu nền hoặc các xử lý khác ở đây nếu cần
-                });
-                cells[row][col].setOnKeyPressed(this::handleKeyPress);
+
+        for (int blockRow = 0; blockRow < 3; blockRow++) {
+            for (int blockCol = 0; blockCol < 3; blockCol++) {
+                GridPane block = createBlock(blockRow, blockCol);
+                gridP.add(block, blockCol, blockRow);
             }
         }
-        
+
         return gridP;
     }
-    private void setupTextField(TextField textField) {
+    private GridPane createBlock(int blockRow, int blockCol) {
+        GridPane block = new GridPane();
+        block.setGridLinesVisible(false);
+        block.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(1))));
+
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 3; col++) {
+                int globalRow = blockRow * 3 + row;
+                int globalCol = blockCol * 3 + col;
+                String value = puzzle.getValue(globalRow, globalCol);
+
+                TextField cell = new TextField();
+                cells[globalRow][globalCol] = cell;
+                setupTextField(cell, value);
+                cell.setText(value);
+                cell.setPrefSize(CELL_SIZE, CELL_SIZE);
+                cell.setAlignment(Pos.CENTER);
+
+                final int currentRow = globalRow;
+                final int currentCol = globalCol;
+                cell.setOnMouseClicked(event -> {
+                    currentlySelectedRow = currentRow;
+                    currentlySelectedCol = currentCol;
+                    // Update background color or other actions if needed
+                    updateCellColors();
+                });
+                cell.setOnKeyPressed(this::handleKeyPress);
+
+                block.add(cell, col, row);
+            }
+        }
+
+        return block;
+    }
+    private void setupTextField(TextField textField, String value) {
         textField.setPrefSize(CELL_SIZE, CELL_SIZE);
         textField.setAlignment(Pos.CENTER);
         textField.setFont(Font.font(20));
-        textField.setStyle("-fx-background-color: white; -fx-border-color: black; -fx-border-width: 0.4;-fx-text-fill: black;");
+        if (value.isEmpty()){
+            textField.setStyle("-fx-background-color: white; -fx-border-color: lightgray; -fx-border-width: 0.4;-fx-text-fill: white;");
+        }else{
+            textField.setStyle("-fx-background-color: white; -fx-border-color: lightgray; -fx-border-width: 0.4;-fx-text-fill: black;");
+        }
         // // Sự kiện MouseEvent để điều khiển màu nền khi chọn
         // textField.addEventFilter(MouseEvent.MOUSE_ENTERED, event -> {
         //     if (textField.isEditable()) {
@@ -86,6 +118,49 @@ public class SudokuPanel{
             }
             return null;
         }));
+    }
+    private void updateCellColors() {
+        // Reset all cell colors
+        for (int row = 0; row < SIZE; row++) {
+            for (int col = 0; col < SIZE; col++) {
+                TextField cell = cells[row][col];
+                String value = cell.getText();
+                String textColor = "-fx-text-fill: black;"; // Default text color
+                if (cell.getStyle().contains("-fx-text-fill: red")) {
+                    textColor = "-fx-text-fill: red;";
+                } else if (cell.getStyle().contains("-fx-text-fill: blue")) {
+                    textColor = "-fx-text-fill: blue;";
+                } else if (cell.getStyle().contains("-fx-text-fill: white")) {
+                    textColor = "-fx-text-fill: white;";
+                } else if (cell.getStyle().contains("-fx-text-fill: #FFD700")) {
+                    textColor = "-fx-text-fill: #FFD700;";
+                }
+                
+                if (value.isEmpty()) {
+                    cell.setStyle("-fx-background-color: white; -fx-border-color: lightgray; -fx-border-width: 0.4;" + textColor);
+                } else {
+                    cell.setStyle("-fx-background-color: white; -fx-border-color: lightgray; -fx-border-width: 0.4;" + textColor);
+                }
+            }
+        }
+    
+        // Highlight the selected cell and its row and column
+        if (currentlySelectedRow != -1 && currentlySelectedCol != -1) {
+            for (int i = 0; i < SIZE; i++) {
+                updateCellBackground(cells[currentlySelectedRow][i], "rgba(0, 0, 255, 0.3)");
+                updateCellBackground(cells[i][currentlySelectedCol], "rgba(0, 0, 255, 0.3)");
+            }
+            updateCellBackground(cells[currentlySelectedRow][currentlySelectedCol], "rgba(0, 0, 255, 0.5)");
+        }
+    }
+    
+    private void updateCellBackground(TextField cell, String backgroundColor) {
+        String style = cell.getStyle();
+        String textColor = style.contains("-fx-text-fill: red") ? "-fx-text-fill: red;" :
+                           style.contains("-fx-text-fill: blue") ? "-fx-text-fill: blue;" :
+                           style.contains("-fx-text-fill: #FFD700") ? "-fx-text-fill: #FFD700;" :
+                           style.contains("-fx-text-fill: black") ? "-fx-text-fill: black;" : "-fx-text-fill: white;";
+        cell.setStyle("-fx-background-color: " + backgroundColor + "; -fx-border-color: lightgray; -fx-border-width: 0.4;" + textColor);
     }
     private void showAlert(String title, String message, AlertType alertType) {
         Alert alert = new Alert(alertType);
@@ -138,13 +213,14 @@ public class SudokuPanel{
     
             if (puzzle.isValidMove(row, col, value) && hint < 5) {
                 cells[row][col].setText(value);
-                cells[row][col].setStyle("-fx-background-color: white; -fx-border-color: black; -fx-border-width: 0.4; -fx-text-fill: #FFD700;");
+                cells[row][col].setStyle("-fx-text-fill: #FFD700;");
                 puzzle.board[row][col] = value;
                 hint++;
                 appUI.updateHint(hint);
                 return; 
             }
         }
+        updateCellColors();
     }
     public void deleteValue() {
         if (currentlySelectedRow != -1 && currentlySelectedCol != -1) {
@@ -212,13 +288,18 @@ public class SudokuPanel{
     public void handleButtonClick(String number){
         // Check if the currently selected row and column are set
         if (currentlySelectedRow == -1 || currentlySelectedCol == -1) {
-            showAlert("No Cell Selected", "Please select a cell before making a move.", AlertType.WARNING);
+            showAlert("Chưa chọn ô", "Chọn một ô trước khi điền số", AlertType.WARNING);
             return; // Exit the method as no cell is selected
+        }
+        if(cells[currentlySelectedRow][currentlySelectedCol].getStyle().contains("-fx-text-fill: black") || cells[currentlySelectedRow][currentlySelectedCol].getStyle().contains("-fx-text-fill: #FFD700")){
+            System.out.println(cells[currentlySelectedRow][currentlySelectedCol].getText());
+            showAlert("Thông báo", "Bạn không thể điền vào ô này", AlertType.WARNING);
+            return;
         }
         //Check user make right choice or not
         if (!puzzle.getSolutionValue(currentlySelectedRow, currentlySelectedCol).equals(number)) {
             cells[currentlySelectedRow][currentlySelectedCol].setText(number);
-            cells[currentlySelectedRow][currentlySelectedCol].setStyle("-fx-background-color: white; -fx-border-color: black; -fx-border-width: 0.4;-fx-text-fill: red;");
+            cells[currentlySelectedRow][currentlySelectedCol].setStyle("-fx-text-fill: red;");
             puzzle.getBoard()[currentlySelectedRow][currentlySelectedCol] = number;
             moveHistory.push(new int[]{currentlySelectedRow, currentlySelectedCol});
             mistake++;
@@ -227,10 +308,11 @@ public class SudokuPanel{
         }
         else{
             cells[currentlySelectedRow][currentlySelectedCol].setText(number);
-            cells[currentlySelectedRow][currentlySelectedCol].setStyle("-fx-background-color: white; -fx-border-color: black; -fx-border-width: 0.4;-fx-text-fill: blue;");
+            cells[currentlySelectedRow][currentlySelectedCol].setStyle("-fx-text-fill: blue;");
             puzzle.getBoard()[currentlySelectedRow][currentlySelectedCol] = number;
             moveHistory.push(new int[]{currentlySelectedRow, currentlySelectedCol});
             checkBoardFull();
         }
+        updateCellColors();
     }
 }
