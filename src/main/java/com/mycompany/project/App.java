@@ -11,6 +11,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -44,7 +45,7 @@ public class App extends Application {
     private GridPane suGrid;
     private SudokuPanel sudokuPanel = new SudokuPanel();
 
-    private VBox maincontainer;
+    private AnchorPane maincontainer;
     private HBox root;
 
     private int secondsPassed = 0;
@@ -106,7 +107,7 @@ public class App extends Application {
 
     private HBox createControlHeader() {
         HBox header = new HBox(20);
-        header.setAlignment(Pos.TOP_LEFT);
+        header.setAlignment(Pos.CENTER);
     
         Label mode = new Label("Mode:");
         btnEasy = new Button("Easy");
@@ -164,21 +165,31 @@ public class App extends Application {
         lblTime.setFont(Font.font(labelStyle, FontWeight.BOLD, 14));
         lblHint.setFont(Font.font(labelStyle, FontWeight.BOLD, 14));
 
-        HBox hHeaderlbl = new HBox(50);
-        hHeaderlbl.setAlignment(Pos.CENTER); // Căn giữa các label
-        hHeaderlbl.getChildren().addAll(lblHint, lblMis, lblScore, lblTime);
+        HBox hFooterlbl = new HBox(50);
+        hFooterlbl.setAlignment(Pos.CENTER); // Căn giữa các label
+        hFooterlbl.getChildren().addAll(lblHint, lblMis, lblScore, lblTime);
 
         // Thiết lập root và maincontainer
-        root = new HBox(20, suGrid, controlHeader, controlPanel);
+        root = new HBox(20, suGrid, controlPanel);
         root.setPadding(new Insets(20));
         root.setAlignment(Pos.CENTER);
 
-        maincontainer = new VBox(20, controlHeader, root, hHeaderlbl);
+        maincontainer = new AnchorPane(controlHeader, root, hFooterlbl);
         maincontainer.setPadding(new Insets(20));
-        maincontainer.setAlignment(Pos.CENTER);
+        AnchorPane.setTopAnchor(controlHeader, 10.0);
+        AnchorPane.setLeftAnchor(controlHeader, 10.0);
+        AnchorPane.setRightAnchor(controlHeader, 10.0);
 
+        AnchorPane.setTopAnchor(root, 50.0);
+        AnchorPane.setBottomAnchor(root, 10.0);
+        AnchorPane.setLeftAnchor(root, 10.0);
+        AnchorPane.setRightAnchor(root, 10.0);
+
+        AnchorPane.setBottomAnchor(hFooterlbl, 10.0);
+        AnchorPane.setLeftAnchor(hFooterlbl, 10.0);
+        AnchorPane.setRightAnchor(hFooterlbl, 10.0);
         // Thiết lập scene và stage
-        Scene scene = new Scene(maincontainer, 800, 800);
+        Scene scene = new Scene(maincontainer, 900, 800);
         scene.setFill(Color.WHITE); // Đặt màu nền của Scene là màu trắng
 
         // Thiết lập sự kiện thay đổi kích thước cho Scene

@@ -71,7 +71,7 @@ public class SudokuPanel{
                 cell.setText(value);
                 cell.setPrefSize(CELL_SIZE, CELL_SIZE);
                 cell.setAlignment(Pos.CENTER);
-
+                cell.setEditable(false);
                 final int currentRow = globalRow;
                 final int currentCol = globalCol;
                 cell.setOnMouseClicked(event -> {
