@@ -7,7 +7,9 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderStroke;
@@ -15,23 +17,31 @@ import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
 public class SudokuPanel{
     private static final int SIZE=9;
     private static final int CELL_SIZE=60;
+    private final TextField[][] cells = new TextField[SIZE][SIZE];
+    private final SudokuGenerator generator = new SudokuGenerator();
+    private final Stack<int[]> moveHistory = new Stack<>();
+    private final Label[][] labels = new Label[SIZE][SIZE];
 
     private App appUI;
+    private GridPane gridP;
+    
+
     private int currentlySelectedCol = -1;
     private int currentlySelectedRow = -1;
-    private TextField[][] cells = new TextField[SIZE][SIZE];
-    private GridPane gridP;
+    
     private int mistake;
     private int hint;
-    private SudokuGenerator generator = new SudokuGenerator();
+    
     private SudokuPuzzle puzzle = generator.generateRandomSudoku(SudokuPuzzleType.NINEBYNINE, "Medium");
-    private final Stack<int[]> moveHistory = new Stack<>();
+    
     //Setup
     public void newSudokuPuzzle(SudokuPuzzle puzzle) {
 		this.puzzle = puzzle;
@@ -49,13 +59,15 @@ public class SudokuPanel{
             for (int blockCol = 0; blockCol < 3; blockCol++) {
                 GridPane block = createBlock(blockRow, blockCol);
                 gridP.add(block, blockCol, blockRow);
+                GridPane.setHgrow(block, Priority.ALWAYS);
+                GridPane.setVgrow(block, Priority.ALWAYS);
             }
         }
-
         return gridP;
     }
     private GridPane createBlock(int blockRow, int blockCol) {
         GridPane block = new GridPane();
+        block.setAlignment(Pos.CENTER);
         block.setGridLinesVisible(false);
         block.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(1))));
 
@@ -64,25 +76,35 @@ public class SudokuPanel{
                 int globalRow = blockRow * 3 + row;
                 int globalCol = blockCol * 3 + col;
                 String value = puzzle.getValue(globalRow, globalCol);
-
+                StackPane cellContainer = new StackPane();
                 TextField cell = new TextField();
                 cells[globalRow][globalCol] = cell;
                 setupTextField(cell, value);
                 cell.setText(value);
-                cell.setPrefSize(CELL_SIZE, CELL_SIZE);
                 cell.setAlignment(Pos.CENTER);
+                cell.autosize();
+                // Tạo Label cho note/pencil mark
+                Label noteLabel = new Label();
+                noteLabel.setFont(Font.font(12));
+                noteLabel.setTextFill(Color.GRAY);
+                StackPane.setAlignment(noteLabel, Pos.TOP_LEFT);
+                cellContainer.getChildren().addAll(cell, noteLabel);
+                labels[globalRow][globalCol] = noteLabel;
 
                 final int currentRow = globalRow;
                 final int currentCol = globalCol;
                 cell.setOnMouseClicked(event -> {
                     currentlySelectedRow = currentRow;
                     currentlySelectedCol = currentCol;
-                    // Update background color or other actions if needed
                     updateCellColors();
                 });
                 cell.setOnKeyPressed(this::handleKeyPress);
 
-                block.add(cell, col, row);
+                block.add(cellContainer, col, row);
+                
+                GridPane.setHgrow(cellContainer, Priority.ALWAYS);
+                GridPane.setVgrow(cellContainer, Priority.ALWAYS);
+    
             }
         }
 
@@ -93,24 +115,10 @@ public class SudokuPanel{
         textField.setAlignment(Pos.CENTER);
         textField.setFont(Font.font(20));
         if (value.isEmpty()){
-            textField.setStyle("-fx-background-color: white; -fx-border-color: lightgray; -fx-border-width: 0.4;-fx-text-fill: white;");
+            textField.setStyle("-fx-background-color: white; -fx-border-color: lightgray; -fx-border-width: 0.4; -fx-text-fill: white;");
         }else{
-            textField.setStyle("-fx-background-color: white; -fx-border-color: lightgray; -fx-border-width: 0.4;-fx-text-fill: black;");
+            textField.setStyle("-fx-background-color: white; -fx-border-color: lightgray; -fx-border-width: 0.4; -fx-text-fill: black;");
         }
-        // // Sự kiện MouseEvent để điều khiển màu nền khi chọn
-        // textField.addEventFilter(MouseEvent.MOUSE_ENTERED, event -> {
-        //     if (textField.isEditable()) {
-        //         textField.setStyle("-fx-background-color: rgba(0, 128, 0, 0.3); -fx-border-color: black; -fx-border-width: 0.5;");
-        //     }
-        // });
-        // Sự kiện MouseEvent để điều khiển màu nền khi không chọn
-        // textField.addEventFilter(MouseEvent.MOUSE_EXITED, event -> {
-        //     if (textField.isEditable()) {
-        //         textField.setStyle("-fx-background-color: white; -fx-border-color: black; -fx-border-width: 0.4;");
-        //     }
-        // });
-        
-        // Chỉ cho phép nhập số
         textField.setTextFormatter(new javafx.scene.control.TextFormatter<>(change -> {
             String newText = change.getControlNewText();
             if (newText.matches("[1-9]?")) {
@@ -209,6 +217,8 @@ public class SudokuPanel{
             appUI.updateMistakeLabel(mistake);
         }
     }
+
+
     //Event
     public void autoFill(){
         Stack<int[]> emptySlots = puzzle.emptySlot();
@@ -262,6 +272,20 @@ public class SudokuPanel{
             // Assuming repaint() is used to refresh the UI in Swing context; adjust as needed for JavaFX
         } else {
             showAlert("Thông báo", "Chưa chọn ô để xóa", AlertType.INFORMATION);
+        }
+    }
+    public void takeNote(){
+        // Check if the currently selected row and column are set
+        if (currentlySelectedRow == -1 || currentlySelectedCol == -1) {
+            showAlert("Chưa chọn ô", "Chọn một ô trước khi điền số", AlertType.WARNING);
+        }else{
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("Ghi chú");
+            dialog.setHeaderText("Nhập ghi chú cho ô đã chọn:");
+            dialog.setContentText("Ghi chú:");
+
+            Optional<String> result = dialog.showAndWait();
+            result.ifPresent(note -> labels[currentlySelectedRow][currentlySelectedCol].setText(note));
         }
     }
     public void gameOver(int mistake){

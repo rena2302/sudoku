@@ -1,6 +1,5 @@
 package com.mycompany.project;
 
-import javafx.util.Duration;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
@@ -11,13 +10,16 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 
 public class App extends Application {
@@ -40,11 +42,12 @@ public class App extends Application {
     private Label lblScore;
     private Label lblTime;
     private Label lblHint;
-
+    private Label lblMode;
+    
     private GridPane suGrid;
-    private SudokuPanel sudokuPanel = new SudokuPanel();
+    private final SudokuPanel sudokuPanel = new SudokuPanel();
 
-    private VBox maincontainer;
+    private AnchorPane mainContainer;
     private HBox root;
 
     private int secondsPassed = 0;
@@ -54,7 +57,6 @@ public class App extends Application {
     private VBox createControlPanel() {
         VBox controlPanel = new VBox(20);
         controlPanel.setAlignment(Pos.TOP_CENTER);
-        controlPanel.setPrefWidth(200);
     
         btnUndo = new Button("Undo");
         btnDelete = new Button("Delete");
@@ -62,14 +64,14 @@ public class App extends Application {
         btnHint = new Button("Hint");
         btnNew = new Button("NEW GAME");
     
-        btnNew.setPrefWidth(100);
-        btnUndo.setPrefWidth(100);
-        btnDelete.setPrefWidth(100);
-        btnNote.setPrefWidth(100);
-        btnHint.setPrefWidth(100);
+        btnNew.setPrefWidth(200);
+        btnUndo.setPrefWidth(200);
+        btnDelete.setPrefWidth(200);
+        btnNote.setPrefWidth(200);
+        btnHint.setPrefWidth(200);
     
         // Thiết lập nền màu theo mã màu RGB và opacity là 1.000 (100%)
-        String buttonStyle = "-fx-background-color: rgba(234, 238, 244, 1.000); -fx-text-fill: darkblue; -fx-background-radius: 10;";
+        String buttonStyle = "-fx-background-color: rgba(234, 238, 244, 1.000); -fx-text-fill: darkblue; -fx-background-radius: 10;-fx-font-size: 16px;";
     
         btnNew.setStyle(buttonStyle);
         btnUndo.setStyle(buttonStyle);
@@ -91,12 +93,12 @@ public class App extends Application {
     
         for (int i = 1; i <= 9; i++) {
             Button numberButton = new Button(String.valueOf(i));
-            numberButton.setPrefSize(50, 50);
-            numberButton.setFont(Font.font(18));
+            numberButton.setPrefSize(70, 70);
+            numberButton.setFont(Font.font(20));
     
-            // Thiết lập nền màu xanh biển nhạt và chữ màu xanh biển đậm
-            numberButton.setStyle("-fx-background-color: rgba(234,238,244,1.000); -fx-text-fill: darkblue; -fx-background-radius: 10;");
-    
+            String buttonStyle = "-fx-background-color: rgba(234,238,244,1.000); -fx-text-fill: darkblue; -fx-background-radius: 10;";
+            numberButton.setStyle(buttonStyle);
+
             numberButton.setOnAction(event -> sudokuPanel.handleButtonClick(numberButton.getText()));
             numberPad.add(numberButton, (i - 1) % 3, (i - 1) / 3);
         }
@@ -106,9 +108,9 @@ public class App extends Application {
 
     private HBox createControlHeader() {
         HBox header = new HBox(20);
-        header.setAlignment(Pos.TOP_LEFT);
-    
-        Label mode = new Label("Mode:");
+        header.setAlignment(Pos.CENTER);
+        HBox.setHgrow(header, Priority.ALWAYS);
+        lblMode = new Label("Mode:");
         btnEasy = new Button("Easy");
         btnMed = new Button("Medium");
         btnHard = new Button("Hard");
@@ -116,18 +118,18 @@ public class App extends Application {
         btnMas = new Button("Master");
         btnEXtr = new Button("Extremely");
     
-        btnEasy.setPrefWidth(100);
-        btnMed.setPrefWidth(100);
-        btnHard.setPrefWidth(100);
-        btnEx.setPrefWidth(100);
-        btnMas.setPrefWidth(100);
-        btnEXtr.setPrefWidth(100);
+        btnEasy.setPrefWidth(120);
+        btnMed.setPrefWidth(120);
+        btnHard.setPrefWidth(120);
+        btnEx.setPrefWidth(120);
+        btnMas.setPrefWidth(120);
+        btnEXtr.setPrefWidth(120);
     
         // Thiết lập nền màu và chữ màu xanh biển nhạt
-        String buttonStyle = "-fx-background-color: rgba(234, 238, 244, 1.000); -fx-text-fill: darkblue; -fx-background-radius: 10;";
+        String buttonStyle = "-fx-background-color: rgba(234, 238, 244, 1.000); -fx-text-fill: darkblue; -fx-background-radius: 10;-fx-font-size: 18px;";
 
-        mode.setStyle("-fx-text-fill: darkblue;");
-        mode.setFont(Font.font(buttonStyle, FontWeight.BOLD, 13));
+        lblMode.setStyle("-fx-text-fill: darkblue;-fx-font-size: 24px;");
+        lblMode.setFont(Font.font(buttonStyle, FontWeight.BOLD, 13));
         btnEasy.setStyle(buttonStyle);
         btnMed.setStyle(buttonStyle);
         btnHard.setStyle(buttonStyle);
@@ -135,7 +137,7 @@ public class App extends Application {
         btnMas.setStyle(buttonStyle);
         btnEXtr.setStyle(buttonStyle);
     
-        header.getChildren().addAll(mode, btnEasy, btnMed, btnHard, btnEx, btnMas, btnEXtr);
+        header.getChildren().addAll(lblMode, btnEasy, btnMed, btnHard, btnEx, btnMas, btnEXtr);
         return header;
     }
     
@@ -152,61 +154,61 @@ public class App extends Application {
         lblTime = new Label("Timer: 00:00");
         lblHint = new Label("Hint: 0/5");
 
-        // Thiết lập màu chữ xanh
         String labelStyle = "-fx-text-fill: darkblue;";
         lblMis.setStyle(labelStyle);
         lblScore.setStyle(labelStyle);
         lblTime.setStyle(labelStyle);
         lblHint.setStyle(labelStyle);
-        
-        lblMis.setFont(Font.font(labelStyle, FontWeight.BOLD, 14));
-        lblScore.setFont(Font.font(labelStyle, FontWeight.BOLD, 14));
-        lblTime.setFont(Font.font(labelStyle, FontWeight.BOLD, 14));
-        lblHint.setFont(Font.font(labelStyle, FontWeight.BOLD, 14));
 
-        HBox hHeaderlbl = new HBox(50);
-        hHeaderlbl.setAlignment(Pos.CENTER); // Căn giữa các label
-        hHeaderlbl.getChildren().addAll(lblHint, lblMis, lblScore, lblTime);
+        lblMis.setFont(Font.font("System", FontWeight.BOLD, 14));
+        lblScore.setFont(Font.font("System", FontWeight.BOLD, 14));
+        lblTime.setFont(Font.font("System", FontWeight.BOLD, 14));
+        lblHint.setFont(Font.font("System", FontWeight.BOLD, 14));
 
-        // Thiết lập root và maincontainer
-        root = new HBox(20, suGrid, controlHeader, controlPanel);
+        HBox footerLbl = new HBox(50);
+        footerLbl.setAlignment(Pos.CENTER);
+        footerLbl.getChildren().addAll(lblHint, lblMis, lblScore, lblTime);
+
+        root = new HBox(20, suGrid, controlPanel);
         root.setPadding(new Insets(20));
         root.setAlignment(Pos.CENTER);
 
-        maincontainer = new VBox(20, controlHeader, root, hHeaderlbl);
-        maincontainer.setPadding(new Insets(20));
-        maincontainer.setAlignment(Pos.CENTER);
+        mainContainer = new AnchorPane(controlHeader, root, footerLbl);
+        mainContainer.setPadding(new Insets(20));
+        
+       // Anchor the controlHeader and hHeaderlbl
+        AnchorPane.setTopAnchor(controlHeader, 10.0);
+        AnchorPane.setLeftAnchor(controlHeader, 10.0);
+        AnchorPane.setRightAnchor(controlHeader, 10.0);
 
-        // Thiết lập scene và stage
-        Scene scene = new Scene(maincontainer, 800, 800);
-        scene.setFill(Color.WHITE); // Đặt màu nền của Scene là màu trắng
+        // Anchor the root and make suGrid grow with the container
+        AnchorPane.setTopAnchor(root, 50.0);
+        AnchorPane.setLeftAnchor(root, 10.0);
+        AnchorPane.setRightAnchor(root, 10.0);
+        AnchorPane.setBottomAnchor(root, 20.0);
 
-        // Thiết lập sự kiện thay đổi kích thước cho Scene
-        scene.widthProperty().addListener((obs, oldVal, newVal) -> {
-            resizeComponents(newVal.doubleValue());
-        });
+        // Make suGrid grow with the container
+        HBox.setHgrow(suGrid, Priority.ALWAYS);
 
-        scene.heightProperty().addListener((obs, oldVal, newVal) -> {
-            resizeComponents(newVal.doubleValue());
-        });
+        AnchorPane.setBottomAnchor(footerLbl, 10.0);
+        AnchorPane.setLeftAnchor(footerLbl, 10.0);
+        AnchorPane.setRightAnchor(footerLbl, 10.0);
+            
+
+        Scene scene = new Scene(mainContainer, 1280, 720);
+        scene.setFill(Color.WHITE);
 
         stage.setTitle("SUDOKU");
-        stage.setResizable(true); // Cho phép thay đổi kích thước cửa sổ
+        stage.setResizable(true);
         stage.setScene(scene);
         stage.show();
 
-        // Đặt AppUI cho sudokuPanel và khởi tạo timer
         sudokuPanel.setAppUI(this);
         initializeTimer();
         startTimer();
         handleButtonClick();
     }
-    // Phương thức để thay đổi kích thước các thành phần bên trong theo kích thước Scene mới
-        private void resizeComponents(double newSceneSize) {
-        // Thay đổi kích thước các thành phần trong maincontainer theo kích thước Scene mới
-        maincontainer.setPrefWidth(newSceneSize);
-        maincontainer.setPrefHeight(newSceneSize);
-    }
+
     //Getter Setter
     @SuppressWarnings("exports")
     public GridPane getSuGrid() {
@@ -248,6 +250,7 @@ public class App extends Application {
         btnDelete.setOnAction(event -> sudokuPanel.deleteValue());
         btnHint.setOnAction(event -> sudokuPanel.autoFill());
         btnNew.setOnAction(event -> sudokuPanel.playAgain(this.mode));
+        btnNote.setOnAction(event -> sudokuPanel.takeNote());
     }
     private void showConfirmationDialog(String mode) {
         Alert alert = new Alert(AlertType.CONFIRMATION);
