@@ -79,10 +79,8 @@ public class SudokuPanel{
                 StackPane cellContainer = new StackPane();
                 TextField cell = new TextField();
                 cells[globalRow][globalCol] = cell;
-                setupTextField(cell, value);
+                setupTextField(cell, value, cellContainer);
                 cell.setText(value);
-                cell.setAlignment(Pos.CENTER);
-                cell.autosize();
                 // Tạo Label cho note/pencil mark
                 Label noteLabel = new Label();
                 noteLabel.setFont(Font.font(12));
@@ -110,7 +108,7 @@ public class SudokuPanel{
 
         return block;
     }
-    private void setupTextField(TextField textField, String value) {
+    private void setupTextField(TextField textField, String value, StackPane container) {
         textField.setPrefSize(CELL_SIZE, CELL_SIZE);
         textField.setAlignment(Pos.CENTER);
         textField.setFont(Font.font(20));
@@ -127,6 +125,9 @@ public class SudokuPanel{
             }
             return null;
         }));
+        // Bind the text field size to the container size
+        textField.prefWidthProperty().bind(container.widthProperty());
+        textField.prefHeightProperty().bind(container.heightProperty());
     }
     private void updateCellColors() {
         // Reset all cell colors
