@@ -114,6 +114,7 @@ public class SudokuPanel{
         textField.setPrefSize(CELL_SIZE, CELL_SIZE);
         textField.setAlignment(Pos.CENTER);
         textField.setFont(Font.font(20));
+        textField.setEditable(false);
         if (value.isEmpty()){
             textField.setStyle("-fx-background-color: white; -fx-border-color: lightgray; -fx-border-width: 0.4; -fx-text-fill: white;");
         }else{
