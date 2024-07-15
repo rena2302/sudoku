@@ -8,6 +8,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.image.PixelBuffer;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
@@ -169,9 +170,12 @@ public class App extends Application {
         footerLbl.setAlignment(Pos.CENTER);
         footerLbl.getChildren().addAll(lblHint, lblMis, lblScore, lblTime);
 
-        root = new HBox(20, suGrid, controlPanel);
+        root = new HBox(30, suGrid, controlPanel);
         root.setPadding(new Insets(20));
         root.setAlignment(Pos.CENTER);
+
+        suGrid.prefWidthProperty().bind(root.widthProperty());
+        suGrid.prefHeightProperty().bind(root.heightProperty());
 
         mainContainer = new AnchorPane(controlHeader, root, footerLbl);
         mainContainer.setPadding(new Insets(20));
@@ -195,7 +199,7 @@ public class App extends Application {
         AnchorPane.setRightAnchor(footerLbl, 10.0);
             
 
-        Scene scene = new Scene(mainContainer, 1280, 720);
+        Scene scene = new Scene(mainContainer, 800, 600);
         scene.setFill(Color.WHITE);
 
         stage.setTitle("SUDOKU");
@@ -234,10 +238,17 @@ public class App extends Application {
         return mode;
     }
 
+    @SuppressWarnings("exports")
+    public HBox getRoot(){
+        return root;
+    }
     public void setMode(String mode) {
         this.mode = mode;
     }
 
+    public int getSecondPassed(){
+        return secondsPassed;
+    }
     //Handle Event
     private void handleButtonClick(){
         btnEasy.setOnAction(event -> showConfirmationDialog("Easy"));
@@ -310,41 +321,61 @@ public class App extends Application {
         lblTime.setText(timeFormatted);
     }
     public void rebuildInterface(){
-        suGrid.getChildren().clear(); // Xóa hết các thành phần trong gridP
-        // Tạo lại lưới Sudoku
+        suGrid.getChildren().clear(); // Clear all components in suGrid
+        // Recreate the Sudoku grid
         suGrid = sudokuPanel.createSudokuGrid();
+        suGrid.prefWidthProperty().bind(root.widthProperty());
+        suGrid.prefHeightProperty().bind(root.heightProperty());
+        // Apply layout properties if necessary
+        suGrid.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE); // Ensure it can grow
+        
+        // Remove old grid and add the new one
         root.getChildren().remove(0);
         root.getChildren().add(0, suGrid);
-        // Cập nhật lại các thành phần điều khiển khác nếu cần
+        
+        // Update other control components if necessary
         resetTimer();
         startTimer();
         sudokuPanel.resetMoveHistory();
         sudokuPanel.resetHint();
         sudokuPanel.resetMistakes();
-        // Đặt lại gridP vào giao diện người dùng
+        sudokuPanel.resetScore();
     }
+    
     public void rebuildMode(String mode){
         SudokuPuzzle newPuzzle = new SudokuGenerator().generateRandomSudoku(SudokuPuzzleType.NINEBYNINE, mode);
         sudokuPanel.newSudokuPuzzle(newPuzzle);
-        suGrid.getChildren().clear(); // Xóa hết các thành phần trong gridP
-        // Tạo lại lưới Sudoku
+        suGrid.getChildren().clear(); // Clear all components in suGrid
+        
+        // Recreate the Sudoku grid
         suGrid = sudokuPanel.createSudokuGrid();
+        suGrid.prefWidthProperty().bind(root.widthProperty());
+        suGrid.prefHeightProperty().bind(root.heightProperty());
+        // Apply layout properties if necessary
+        suGrid.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE); // Ensure it can grow
+        
+        // Remove old grid and add the new one
         root.getChildren().remove(0);
         root.getChildren().add(0, suGrid);
-        // Cập nhật lại các thành phần điều khiển khác nếu cần
+        
+        // Update other control components if necessary
         resetTimer();
         startTimer();
         sudokuPanel.resetMoveHistory();
         sudokuPanel.resetHint();
         sudokuPanel.resetMistakes();
+        sudokuPanel.resetScore();
     }
+    
     public void updateMistakeLabel(int mistakes) {
         lblMis.setText("Mistakes: " + mistakes + "/3");
     }
     public void updateHint(int hint){
         lblHint.setText("Hint: " + hint + "/5");
     }
-    
+    public void updateScore(int score){
+        lblScore.setText("Score: " + score);
+    }
     public static void main(String[] args) {
             launch(args);
         

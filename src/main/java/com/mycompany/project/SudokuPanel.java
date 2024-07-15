@@ -24,7 +24,6 @@ import javafx.scene.text.Font;
 
 public class SudokuPanel{
     private static final int SIZE=9;
-    private static final int CELL_SIZE=60;
     private final TextField[][] cells = new TextField[SIZE][SIZE];
     private final SudokuGenerator generator = new SudokuGenerator();
     private final Stack<int[]> moveHistory = new Stack<>();
@@ -39,6 +38,7 @@ public class SudokuPanel{
     
     private int mistake;
     private int hint;
+    private int score;
     
     private SudokuPuzzle puzzle = generator.generateRandomSudoku(SudokuPuzzleType.NINEBYNINE, "Medium");
     
@@ -70,7 +70,7 @@ public class SudokuPanel{
         block.setAlignment(Pos.CENTER);
         block.setGridLinesVisible(false);
         block.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(1))));
-
+    
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col++) {
                 int globalRow = blockRow * 3 + row;
@@ -81,14 +81,15 @@ public class SudokuPanel{
                 cells[globalRow][globalCol] = cell;
                 setupTextField(cell, value, cellContainer);
                 cell.setText(value);
-                // Tạo Label cho note/pencil mark
+    
+                // Create Label for note/pencil mark
                 Label noteLabel = new Label();
                 noteLabel.setFont(Font.font(12));
                 noteLabel.setTextFill(Color.GRAY);
                 StackPane.setAlignment(noteLabel, Pos.TOP_LEFT);
                 cellContainer.getChildren().addAll(cell, noteLabel);
                 labels[globalRow][globalCol] = noteLabel;
-
+    
                 final int currentRow = globalRow;
                 final int currentCol = globalCol;
                 cell.setOnMouseClicked(event -> {
@@ -97,25 +98,25 @@ public class SudokuPanel{
                     updateCellColors();
                 });
                 cell.setOnKeyPressed(this::handleKeyPress);
-
+    
                 block.add(cellContainer, col, row);
-                
+    
                 GridPane.setHgrow(cellContainer, Priority.ALWAYS);
                 GridPane.setVgrow(cellContainer, Priority.ALWAYS);
-    
             }
         }
-
+    
         return block;
     }
+    
     private void setupTextField(TextField textField, String value, StackPane container) {
-        textField.setPrefSize(CELL_SIZE, CELL_SIZE);
         textField.setAlignment(Pos.CENTER);
         textField.setFont(Font.font(20));
         textField.setEditable(false);
-        if (value.isEmpty()){
+        textField.setFocusTraversable(false);  // Prevent focus effects
+        if (value.isEmpty()) {
             textField.setStyle("-fx-background-color: white; -fx-border-color: lightgray; -fx-border-width: 0.4; -fx-text-fill: white;");
-        }else{
+        } else {
             textField.setStyle("-fx-background-color: white; -fx-border-color: lightgray; -fx-border-width: 0.4; -fx-text-fill: black;");
         }
         textField.setTextFormatter(new javafx.scene.control.TextFormatter<>(change -> {
@@ -125,9 +126,14 @@ public class SudokuPanel{
             }
             return null;
         }));
+    
         // Bind the text field size to the container size
         textField.prefWidthProperty().bind(container.widthProperty());
         textField.prefHeightProperty().bind(container.heightProperty());
+    
+        // Set fixed size for the StackPane to prevent resizing
+        container.setPrefSize(50, 50);
+        container.setMinSize(50, 50);
     }
     private void updateCellColors() {
         // Reset all cell colors
@@ -219,7 +225,12 @@ public class SudokuPanel{
             appUI.updateMistakeLabel(mistake);
         }
     }
-
+    public void resetScore(){
+        this.score = 0;
+        if(appUI != null){
+            appUI.updateScore(score);
+        }
+    }
 
     //Event
     public void autoFill(){
@@ -264,10 +275,14 @@ public class SudokuPanel{
             if (puzzle.getBoard()[currentlySelectedRow][currentlySelectedCol].equals("")) {
                 showAlert("Thông báo", "Cell trống", AlertType.INFORMATION);
             } else {
-                if (!cells[currentlySelectedRow][currentlySelectedCol].getStyle().contains("-fx-text-fill: black")) {
+                if (cells[currentlySelectedRow][currentlySelectedCol].getStyle().contains("-fx-text-fill: #FFD700")){
+                    showAlert("Thông báo", "Cell gợi ý", AlertType.INFORMATION);
+                }
+                else if (!cells[currentlySelectedRow][currentlySelectedCol].getStyle().contains("-fx-text-fill: black")) {
                     puzzle.getBoard()[currentlySelectedRow][currentlySelectedCol] = "";
                     cells[currentlySelectedRow][currentlySelectedCol].setText("");
-                } else {
+                } 
+                else {
                     showAlert("Thông báo", "Cell đề bài", AlertType.INFORMATION);
                 }
             }
@@ -290,6 +305,24 @@ public class SudokuPanel{
             result.ifPresent(note -> labels[currentlySelectedRow][currentlySelectedCol].setText(note));
         }
     }
+    public void calculatorScore() {
+        if (currentlySelectedRow == -1 || currentlySelectedCol == -1) {
+            return; // Exit the method as no cell is selected
+        }
+        if (!puzzle.getCorrectBoard()[currentlySelectedRow][currentlySelectedCol]) {
+                int timePassed = appUI.getSecondPassed();
+                if (timePassed < 300) {
+                    score += 500;
+                } else if (timePassed < 600) {
+                    score += 250;
+                } else {
+                    score += 100;
+                }
+                puzzle.getCorrectBoard()[currentlySelectedRow][currentlySelectedCol] = true;
+                appUI.updateScore(score);
+        }
+    }
+    
     public void gameOver(int mistake){
             if (mistake == 3) {
                 showAlert("GameOver", "You make 3/3 mistakes", AlertType.WARNING);
@@ -363,6 +396,7 @@ public class SudokuPanel{
             puzzle.getBoard()[currentlySelectedRow][currentlySelectedCol] = number;
             moveHistory.push(new int[]{currentlySelectedRow, currentlySelectedCol});
             checkBoardFull();
+            calculatorScore();
         }
         updateCellColors();
     }
