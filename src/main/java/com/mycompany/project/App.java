@@ -272,6 +272,7 @@ public class App extends Application {
         btnNew.setOnAction(event -> sudokuPanel.playAgain(this.mode));
         btnNote.setOnAction(event -> sudokuPanel.takeNote());
         btnPause.setOnAction(event -> pauseAction());
+        btnUndo.setOnAction(event -> sudokuPanel.undoMove());
     }
     private void showConfirmationDialog(String mode) {
         Alert alert = new Alert(AlertType.CONFIRMATION);

@@ -291,6 +291,7 @@ public class SudokuPanel{
             showAlert("Thông báo", "Chưa chọn ô để xóa", AlertType.INFORMATION);
         }
     }
+
     public void takeNote(){
         // Check if the currently selected row and column are set
         if (currentlySelectedRow == -1 || currentlySelectedCol == -1) {
@@ -305,21 +306,39 @@ public class SudokuPanel{
             result.ifPresent(note -> labels[currentlySelectedRow][currentlySelectedCol].setText(note));
         }
     }
-    public void calculatorScore() {
+    public void undoMove() {
+        if (!moveHistory.isEmpty()) {
+            int[] lastMove = moveHistory.pop();
+            int row = lastMove[0]; 
+            int col = lastMove[1];
+
+            puzzle.board[row][col] = "";
+            cells[row][col].setText("");
+            }
+    }
+    public void calculatorScore(String value) {
         if (currentlySelectedRow == -1 || currentlySelectedCol == -1) {
-            return; // Exit the method as no cell is selected
+            return;
         }
-        if (!puzzle.getCorrectBoard()[currentlySelectedRow][currentlySelectedCol]) {
-                int timePassed = appUI.getSecondPassed();
-                if (timePassed < 300) {
-                    score += 500;
-                } else if (timePassed < 600) {
-                    score += 250;
-                } else {
-                    score += 100;
-                }
-                puzzle.getCorrectBoard()[currentlySelectedRow][currentlySelectedCol] = true;
-                appUI.updateScore(score);
+    
+        if (puzzle.getCorrectBoard()[currentlySelectedRow][currentlySelectedCol]) {
+            return;
+        }
+    
+        if (puzzle.getSolution()[currentlySelectedRow][currentlySelectedCol].equals(value)) {
+            int timePassed = appUI.getSecondPassed();
+            if (timePassed < 300) {
+                score += 500;
+            } else if (timePassed < 600) {
+                score += 250;
+            } else {
+                score += 100;
+            }
+            puzzle.getCorrectBoard()[currentlySelectedRow][currentlySelectedCol] = true;
+            appUI.updateScore(score);
+        } else {
+            score -= 350;
+            appUI.updateScore(score);
         }
     }
     
@@ -396,8 +415,9 @@ public class SudokuPanel{
             puzzle.getBoard()[currentlySelectedRow][currentlySelectedCol] = number;
             moveHistory.push(new int[]{currentlySelectedRow, currentlySelectedCol});
             checkBoardFull();
-            calculatorScore();
+            calculatorScore(number);
         }
+        
         updateCellColors();
     }
 }
