@@ -1,6 +1,5 @@
 package com.mycompany.project;
 
-import javafx.scene.paint.Color;
 import java.util.Stack;
 
 public class SudokuPuzzle {

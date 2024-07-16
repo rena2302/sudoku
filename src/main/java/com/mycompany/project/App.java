@@ -8,13 +8,15 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.image.PixelBuffer;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.effect.BoxBlur;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -33,6 +35,7 @@ public class App extends Application {
     private Button btnMas;
     private Button btnEXtr;
 
+    private Button btnPause;
     private Button btnUndo;
     private Button btnDelete;
     private Button btnNote;
@@ -50,6 +53,9 @@ public class App extends Application {
 
     private AnchorPane mainContainer;
     private HBox root;
+    private VBox controlPanel;
+    private HBox controlHeader;
+    private HBox footerLbl;
 
     private int secondsPassed = 0;
     private boolean timerIsRunning = false;
@@ -64,12 +70,14 @@ public class App extends Application {
         btnNote = new Button("Note");
         btnHint = new Button("Hint");
         btnNew = new Button("NEW GAME");
+        btnPause = new Button("PAUSE");
     
         btnNew.setPrefWidth(200);
         btnUndo.setPrefWidth(200);
         btnDelete.setPrefWidth(200);
         btnNote.setPrefWidth(200);
         btnHint.setPrefWidth(200);
+        btnPause.setPrefWidth(200);
     
         // Thiết lập nền màu theo mã màu RGB và opacity là 1.000 (100%)
         String buttonStyle = "-fx-background-color: rgba(234, 238, 244, 1.000); -fx-text-fill: darkblue; -fx-background-radius: 10;-fx-font-size: 16px;";
@@ -79,11 +87,12 @@ public class App extends Application {
         btnDelete.setStyle(buttonStyle);
         btnNote.setStyle(buttonStyle);
         btnHint.setStyle(buttonStyle);
+        btnPause.setStyle(buttonStyle);
     
         GridPane numberPad = createNumberPad();
         controlPanel.getChildren().add(numberPad);
     
-        controlPanel.getChildren().addAll(btnNew, btnUndo, btnDelete, btnNote, btnHint);
+        controlPanel.getChildren().addAll(btnNew, btnUndo, btnDelete, btnNote, btnHint, btnPause);
         return controlPanel;
     }    
 
@@ -147,8 +156,8 @@ public class App extends Application {
     @Override
     public void start(Stage stage) {
         suGrid = sudokuPanel.createSudokuGrid();
-        VBox controlPanel = createControlPanel();
-        HBox controlHeader = createControlHeader();
+        controlPanel = createControlPanel();
+        controlHeader = createControlHeader();
 
         lblMis = new Label("Mistake: 0/3");
         lblScore = new Label("Score: 0");
@@ -166,7 +175,7 @@ public class App extends Application {
         lblTime.setFont(Font.font("System", FontWeight.BOLD, 14));
         lblHint.setFont(Font.font("System", FontWeight.BOLD, 14));
 
-        HBox footerLbl = new HBox(50);
+        footerLbl = new HBox(50);
         footerLbl.setAlignment(Pos.CENTER);
         footerLbl.getChildren().addAll(lblHint, lblMis, lblScore, lblTime);
 
@@ -178,7 +187,7 @@ public class App extends Application {
         suGrid.prefHeightProperty().bind(root.heightProperty());
 
         mainContainer = new AnchorPane(controlHeader, root, footerLbl);
-        mainContainer.setPadding(new Insets(20));
+        //mainContainer.setPadding(new Insets(20));
         
        // Anchor the controlHeader and hHeaderlbl
         AnchorPane.setTopAnchor(controlHeader, 10.0);
@@ -262,6 +271,7 @@ public class App extends Application {
         btnHint.setOnAction(event -> sudokuPanel.autoFill());
         btnNew.setOnAction(event -> sudokuPanel.playAgain(this.mode));
         btnNote.setOnAction(event -> sudokuPanel.takeNote());
+        btnPause.setOnAction(event -> pauseAction());
     }
     private void showConfirmationDialog(String mode) {
         Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -278,7 +288,45 @@ public class App extends Application {
             }
         });
     }
+    private void pauseAction(){
+        // Create overlay for PAUSE
+        StackPane pauseOverlay = new StackPane();
+        pauseOverlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.5);");
+        Label pausedText = new Label("PAUSED");
+        pausedText.setFont(Font.font("System", FontWeight.BOLD, 40));
+        pauseOverlay.getChildren().add(pausedText);
+        pauseOverlay.setVisible(false);
 
+        mainContainer.getChildren().add(pauseOverlay);
+        AnchorPane.setTopAnchor(pauseOverlay, 0.0);
+        AnchorPane.setBottomAnchor(pauseOverlay, 0.0);
+        AnchorPane.setLeftAnchor(pauseOverlay, 0.0);
+        AnchorPane.setRightAnchor(pauseOverlay, 0.0);
+
+        // Add blur effect
+        BoxBlur blur = new BoxBlur();
+        blur.setWidth(10);
+        blur.setHeight(10);
+        blur.setIterations(3);
+
+        // Pause button event handler
+        btnPause.setOnAction(event -> {
+            pauseTimer();
+            root.setEffect(blur);
+            controlHeader.setEffect(blur);
+            footerLbl.setEffect(blur);
+            pauseOverlay.setVisible(true);
+        });
+
+        // Resume game on click anywhere
+        pauseOverlay.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            resumeTimer();
+            root.setEffect(null);
+            controlHeader.setEffect(null);
+            footerLbl.setEffect(null);
+            pauseOverlay.setVisible(false);
+        });
+    }
     private void initializeTimer() {
         timer = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
             secondsPassed++;
