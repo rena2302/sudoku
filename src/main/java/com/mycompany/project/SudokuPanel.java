@@ -29,7 +29,7 @@ public class SudokuPanel{
     private final Stack<int[]> moveHistory = new Stack<>();
     private final Label[][] labels = new Label[SIZE][SIZE];
 
-    private App appUI;
+    private GameScreen appUI;
     private GridPane gridP;
     
 
@@ -46,7 +46,7 @@ public class SudokuPanel{
     public void newSudokuPuzzle(SudokuPuzzle puzzle) {
 		this.puzzle = puzzle;
 	}
-    public void setAppUI(App appUI){
+    public void setAppUI(GameScreen appUI){
         this.appUI = appUI;
     }
     
@@ -415,9 +415,9 @@ public class SudokuPanel{
             puzzle.getBoard()[currentlySelectedRow][currentlySelectedCol] = number;
             moveHistory.push(new int[]{currentlySelectedRow, currentlySelectedCol});
             checkBoardFull();
-            calculatorScore(number);
+            
         }
-        
+        calculatorScore(number);
         updateCellColors();
     }
 }
