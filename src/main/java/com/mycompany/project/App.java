@@ -10,6 +10,7 @@ public class App extends Application {
     private Stage primaryStage;
     private MenuScreen menuScreen;
     private GameScreen gameScreen;
+    private RoomScreen roomScreen;
     @SuppressWarnings("exports")
     @Override
     public void start(Stage stage) {
@@ -17,6 +18,7 @@ public class App extends Application {
 
         menuScreen = new MenuScreen();
         gameScreen = new GameScreen();
+        roomScreen = new RoomScreen(primaryStage);
 
         primaryStage.setScene(menuScreen.getMenuScene());
         primaryStage.setTitle("Sudoku Game - Menu");
@@ -30,6 +32,16 @@ public class App extends Application {
             primaryStage.setScene(gameScreen.getMenuScene());
             primaryStage.setTitle("Sudoku Game - Play Offline");
             gameScreen.startTimer();
+        });
+
+        menuScreen.setOnPlayOnline(() -> {
+            primaryStage.setScene(roomScreen.getRoomScene());
+            primaryStage.setTitle("Sudoku Game - Play Online");
+        });
+
+        roomScreen.setOnBack(() ->{
+            primaryStage.setScene(menuScreen.getMenuScene());
+            primaryStage.setTitle("Sudoku Game - Menu");
         });
     }
     public static void main(String[] args) {
