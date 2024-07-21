@@ -48,9 +48,11 @@ public class MenuScreen {
     public void setOnPlayOffline(OnPlayOfflineListener listener) {
         this.onPlayOfflineListener = listener;
     }
+
     public void setOnPlayOnline(OnPlayOnlineListener listener) {
         this.onPlayOnlineListener = listener;
     }
+
     private void handleSettings() {
         // Xử lý khi nhấn nút Settings
         System.out.println("Settings button clicked");
@@ -61,7 +63,6 @@ public class MenuScreen {
     }
 
     // Method để trả về Scene của menu
-    @SuppressWarnings("exports")
     public Scene getMenuScene() {
         return scene;
     }

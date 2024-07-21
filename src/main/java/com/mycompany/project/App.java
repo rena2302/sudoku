@@ -11,17 +11,15 @@ public class App extends Application {
     private MenuScreen menuScreen;
     private GameScreen gameScreen;
     private RoomScreen roomScreen;
-    @SuppressWarnings("exports")
+    private RegisterAndLogin registerAndLogin;
     @Override
     public void start(Stage stage) {
         this.primaryStage = stage;
-
         menuScreen = new MenuScreen();
-        gameScreen = new GameScreen();
-        roomScreen = new RoomScreen(primaryStage);
+        registerAndLogin = new RegisterAndLogin();
 
-        primaryStage.setScene(menuScreen.getMenuScene());
-        primaryStage.setTitle("Sudoku Game - Menu");
+        primaryStage.setScene(registerAndLogin.getScene());
+        primaryStage.setTitle("Sudoku Game - Register Login");
         primaryStage.setResizable(true);
         primaryStage.show();
         
@@ -29,17 +27,30 @@ public class App extends Application {
     }
     private void handleScene(){
         menuScreen.setOnPlayOffline(() -> {
-            primaryStage.setScene(gameScreen.getMenuScene());
+            gameScreen = new GameScreen();
+            primaryStage.setScene(gameScreen.getGameScene());
             primaryStage.setTitle("Sudoku Game - Play Offline");
             gameScreen.startTimer();
+
+            gameScreen.setOnBack(() -> {
+                primaryStage.setScene(menuScreen.getMenuScene());
+                primaryStage.setTitle("Sudoku Game - Menu");
+            });
         });
 
         menuScreen.setOnPlayOnline(() -> {
+            roomScreen = new RoomScreen();
+
             primaryStage.setScene(roomScreen.getRoomScene());
             primaryStage.setTitle("Sudoku Game - Play Online");
+
+            roomScreen.setOnBack(() ->{
+                primaryStage.setScene(menuScreen.getMenuScene());
+                primaryStage.setTitle("Sudoku Game - Menu");
+            });
         });
 
-        roomScreen.setOnBack(() ->{
+        registerAndLogin.setOnLoginSuccess(event -> {
             primaryStage.setScene(menuScreen.getMenuScene());
             primaryStage.setTitle("Sudoku Game - Menu");
         });

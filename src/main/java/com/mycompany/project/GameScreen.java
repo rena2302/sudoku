@@ -23,6 +23,11 @@ import javafx.scene.text.FontWeight;
 import javafx.util.Duration;
 
 public class GameScreen {
+    public interface OnBackListener{
+        void onBack();
+    }
+    private OnBackListener onBackListener;
+
     private String mode = "Medium";
 
     private Button btnEasy;
@@ -38,6 +43,7 @@ public class GameScreen {
     private Button btnNote;
     private Button btnHint;
     private Button btnNew;
+    private Button btnBack;
 
     private Label lblMis;
     private Label lblScore;
@@ -114,7 +120,7 @@ public class GameScreen {
         AnchorPane.setRightAnchor(footerLbl, 10.0);
             
 
-        scene = new Scene(mainContainer, 800, 600);
+        scene = new Scene(mainContainer, 1200, 800);
         scene.setFill(Color.WHITE);
 
         sudokuPanel.setAppUI(this);
@@ -131,13 +137,15 @@ public class GameScreen {
         btnHint = new Button("Hint");
         btnNew = new Button("NEW GAME");
         btnPause = new Button("PAUSE");
-    
+        btnBack = new Button("Back to Menu");
+
         btnNew.setPrefWidth(200);
         btnUndo.setPrefWidth(200);
         btnDelete.setPrefWidth(200);
         btnNote.setPrefWidth(200);
         btnHint.setPrefWidth(200);
         btnPause.setPrefWidth(200);
+        btnBack.setPrefWidth(200);
     
         // Thiết lập nền màu theo mã màu RGB và opacity là 1.000 (100%)
         String buttonStyle = "-fx-background-color: rgba(234, 238, 244, 1.000); -fx-text-fill: darkblue; -fx-background-radius: 10;-fx-font-size: 16px;";
@@ -148,11 +156,12 @@ public class GameScreen {
         btnNote.setStyle(buttonStyle);
         btnHint.setStyle(buttonStyle);
         btnPause.setStyle(buttonStyle);
+        btnBack.setStyle(buttonStyle);
     
         GridPane numberPad = createNumberPad();
         controlPanel.getChildren().add(numberPad);
     
-        controlPanel.getChildren().addAll(btnNew, btnUndo, btnDelete, btnNote, btnHint, btnPause);
+        controlPanel.getChildren().addAll(btnNew, btnUndo, btnDelete, btnNote, btnHint, btnPause, btnBack);
         return controlPanel;
     }    
 
@@ -211,22 +220,18 @@ public class GameScreen {
         return header;
     }
     //Getter Setter
-    @SuppressWarnings("exports")
     public GridPane getSuGrid() {
         return suGrid;
     }
 
-    @SuppressWarnings("exports")
     public void setSuGrid(GridPane suGrid) {
         this.suGrid = suGrid;
     }
     
-    @SuppressWarnings("exports")
     public Button getBtnHint() {
         return btnHint;
     }
 
-    @SuppressWarnings("exports")
     public void setBtnHint(Button btnHint) {
         this.btnHint = btnHint;
     }
@@ -235,7 +240,6 @@ public class GameScreen {
         return mode;
     }
 
-    @SuppressWarnings("exports")
     public HBox getRoot(){
         return root;
     }
@@ -246,9 +250,12 @@ public class GameScreen {
     public int getSecondPassed(){
         return secondsPassed;
     }
-    @SuppressWarnings("exports")
-    public Scene getMenuScene() {
+
+    public Scene getGameScene() {
         return scene;
+    }
+    public void setOnBack(OnBackListener listener){
+        this.onBackListener = listener;
     }
     //Handle Event
     private void handleButtonClick(){
@@ -265,6 +272,12 @@ public class GameScreen {
         btnNote.setOnAction(event -> sudokuPanel.takeNote());
         btnPause.setOnAction(event -> pauseAction());
         btnUndo.setOnAction(event -> sudokuPanel.undoMove());
+
+        btnBack.setOnAction(event -> {
+            if(onBackListener != null){
+                onBackListener.onBack();
+            }
+        });
     }
     private void showConfirmationDialog(String mode) {
         Alert alert = new Alert(AlertType.CONFIRMATION);

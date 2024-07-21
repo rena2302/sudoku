@@ -10,13 +10,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.stage.Stage;
 
 public class RoomScreen {
     public interface onBackListener{
         void onBack();
     }
-    private Stage stage;
     private Scene roomScene;
     
     private Button btnCreateRoom;
@@ -24,10 +22,8 @@ public class RoomScreen {
     private Button btnBack;
     private Label lblTitle;
     private onBackListener onBackListener;
-    @SuppressWarnings("exports")
-    public RoomScreen(Stage primaryStage) {
-        this.stage = primaryStage;
-        
+    
+    public RoomScreen() {
         initializeComponents();
         setupLayout();
         setupActions();
@@ -85,7 +81,7 @@ public class RoomScreen {
     public void setOnBack(onBackListener listener){
         this.onBackListener = listener;
     }
-    @SuppressWarnings("exports")
+
     public Scene getRoomScene() {
         return roomScene;
     }

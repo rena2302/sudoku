@@ -50,7 +50,6 @@ public class SudokuPanel{
         this.appUI = appUI;
     }
     
-    @SuppressWarnings("exports")
     public GridPane createSudokuGrid() {
         gridP = new GridPane();
         gridP.setGridLinesVisible(false);

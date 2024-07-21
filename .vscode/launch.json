@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "App",
+            "request": "launch",
+            "mainClass": "com.mycompany.project/com.mycompany.project.App",
+            "projectName": "Project"
+        },
+        {
+            "type": "java",
+            "name": "Debug JavaFX Application",
+            "request": "launch",
+            "mainClass": "com.mycompany.project.App",
+            "projectName": "Project",
+            "vmArgs": "--module-path \"C:/Program Files/Java/javafx-sdk-22.0.2/lib\" --add-modules javafx.controls,javafx.fxml"
+        }
+    ]
+  }
+  
