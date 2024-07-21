@@ -23,6 +23,10 @@ import javafx.scene.text.FontWeight;
 import javafx.util.Duration;
 
 public class GameScreen {
+    public interface OnBackListener{
+        void onBack();
+    }
+    private OnBackListener onBackListener;
     private String mode = "Medium";
 
     private Button btnEasy;
@@ -38,6 +42,7 @@ public class GameScreen {
     private Button btnNote;
     private Button btnHint;
     private Button btnNew;
+    private Button btnBack;
 
     private Label lblMis;
     private Label lblScore;
@@ -69,7 +74,8 @@ public class GameScreen {
         lblScore = new Label("Score: 0");
         lblTime = new Label("Timer: 00:00");
         lblHint = new Label("Hint: 0/5");
-
+       
+        
         String labelStyle = "-fx-text-fill: darkblue;";
         lblMis.setStyle(labelStyle);
         lblScore.setStyle(labelStyle);
@@ -84,7 +90,7 @@ public class GameScreen {
         footerLbl = new HBox(50);
         footerLbl.setAlignment(Pos.CENTER);
         footerLbl.getChildren().addAll(lblHint, lblMis, lblScore, lblTime);
-
+        
         root = new HBox(30, suGrid, controlPanel);
         root.setPadding(new Insets(20));
         root.setAlignment(Pos.CENTER);
@@ -95,26 +101,22 @@ public class GameScreen {
         mainContainer = new AnchorPane(controlHeader, root, footerLbl);
         //mainContainer.setPadding(new Insets(20));
         
-       // Anchor the controlHeader and hHeaderlbl
         AnchorPane.setTopAnchor(controlHeader, 10.0);
         AnchorPane.setLeftAnchor(controlHeader, 10.0);
         AnchorPane.setRightAnchor(controlHeader, 10.0);
 
-        // Anchor the root and make suGrid grow with the container
         AnchorPane.setTopAnchor(root, 50.0);
         AnchorPane.setLeftAnchor(root, 10.0);
         AnchorPane.setRightAnchor(root, 10.0);
         AnchorPane.setBottomAnchor(root, 20.0);
 
-        // Make suGrid grow with the container
         HBox.setHgrow(suGrid, Priority.ALWAYS);
 
         AnchorPane.setBottomAnchor(footerLbl, 10.0);
         AnchorPane.setLeftAnchor(footerLbl, 10.0);
         AnchorPane.setRightAnchor(footerLbl, 10.0);
-            
 
-        scene = new Scene(mainContainer, 800, 600);
+        scene = new Scene(mainContainer, 1200, 800);
         scene.setFill(Color.WHITE);
 
         sudokuPanel.setAppUI(this);
@@ -131,6 +133,7 @@ public class GameScreen {
         btnHint = new Button("Hint");
         btnNew = new Button("NEW GAME");
         btnPause = new Button("PAUSE");
+        btnBack = new Button("Back to Menu");
     
         btnNew.setPrefWidth(200);
         btnUndo.setPrefWidth(200);
@@ -138,8 +141,8 @@ public class GameScreen {
         btnNote.setPrefWidth(200);
         btnHint.setPrefWidth(200);
         btnPause.setPrefWidth(200);
+        btnBack.setPrefWidth(200);
     
-        // Thiết lập nền màu theo mã màu RGB và opacity là 1.000 (100%)
         String buttonStyle = "-fx-background-color: rgba(234, 238, 244, 1.000); -fx-text-fill: darkblue; -fx-background-radius: 10;-fx-font-size: 16px;";
     
         btnNew.setStyle(buttonStyle);
@@ -148,11 +151,12 @@ public class GameScreen {
         btnNote.setStyle(buttonStyle);
         btnHint.setStyle(buttonStyle);
         btnPause.setStyle(buttonStyle);
+        btnBack.setStyle(buttonStyle);
     
         GridPane numberPad = createNumberPad();
         controlPanel.getChildren().add(numberPad);
     
-        controlPanel.getChildren().addAll(btnNew, btnUndo, btnDelete, btnNote, btnHint, btnPause);
+        controlPanel.getChildren().addAll(btnNew, btnUndo, btnDelete, btnNote, btnHint, btnPause, btnBack);
         return controlPanel;
     }    
 
@@ -195,7 +199,6 @@ public class GameScreen {
         btnMas.setPrefWidth(120);
         btnEXtr.setPrefWidth(120);
     
-        // Thiết lập nền màu và chữ màu xanh biển nhạt
         String buttonStyle = "-fx-background-color: rgba(234, 238, 244, 1.000); -fx-text-fill: darkblue; -fx-background-radius: 10;-fx-font-size: 18px;";
 
         lblMode.setStyle("-fx-text-fill: darkblue;-fx-font-size: 24px;");
@@ -246,9 +249,14 @@ public class GameScreen {
     public int getSecondPassed(){
         return secondsPassed;
     }
+
     @SuppressWarnings("exports")
-    public Scene getMenuScene() {
+    public Scene getGameScene() {
         return scene;
+    }
+
+    public void setOnBack(OnBackListener listener){
+        this.onBackListener = listener;
     }
     //Handle Event
     private void handleButtonClick(){
@@ -265,6 +273,12 @@ public class GameScreen {
         btnNote.setOnAction(event -> sudokuPanel.takeNote());
         btnPause.setOnAction(event -> pauseAction());
         btnUndo.setOnAction(event -> sudokuPanel.undoMove());
+
+        btnBack.setOnAction(event -> {
+            if(onBackListener != null){
+                onBackListener.onBack();
+            }
+        });
     }
     private void showConfirmationDialog(String mode) {
         Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -362,7 +376,7 @@ public class GameScreen {
         lblTime.setText(timeFormatted);
     }
     public void rebuildInterface(){
-        suGrid.getChildren().clear(); // Clear all components in suGrid
+        suGrid.getChildren().clear();
         // Recreate the Sudoku grid
         suGrid = sudokuPanel.createSudokuGrid();
         suGrid.prefWidthProperty().bind(root.widthProperty());
@@ -386,7 +400,7 @@ public class GameScreen {
     public void rebuildMode(String mode){
         SudokuPuzzle newPuzzle = new SudokuGenerator().generateRandomSudoku(SudokuPuzzleType.NINEBYNINE, mode);
         sudokuPanel.newSudokuPuzzle(newPuzzle);
-        suGrid.getChildren().clear(); // Clear all components in suGrid
+        suGrid.getChildren().clear();
         
         // Recreate the Sudoku grid
         suGrid = sudokuPanel.createSudokuGrid();
