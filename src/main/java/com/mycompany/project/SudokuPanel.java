@@ -1,8 +1,6 @@
 package com.mycompany.project;
-import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Random;
-import java.util.Set;
 import java.util.Stack;
 
 import javafx.geometry.Pos;
@@ -294,52 +292,20 @@ public class SudokuPanel{
         }
     }
 
-   public void takeNote(){
+    public void takeNote(){
         // Check if the currently selected row and column are set
         if (currentlySelectedRow == -1 || currentlySelectedCol == -1) {
             showAlert("Chưa chọn ô", "Chọn một ô trước khi điền số", AlertType.WARNING);
-        } else {
+        }else{
             TextInputDialog dialog = new TextInputDialog();
             dialog.setTitle("Ghi chú");
             dialog.setHeaderText("Nhập ghi chú cho ô đã chọn:");
-            dialog.setContentText("Ghi chú (1-9):");
+            dialog.setContentText("Ghi chú:");
 
             Optional<String> result = dialog.showAndWait();
-            result.ifPresent(note -> {
-                // Get the existing notes
-                String currentNotes = labels[currentlySelectedRow][currentlySelectedCol].getText();
-                
-                // Create a set of existing notes
-                Set<Character> noteSet = new LinkedHashSet<>();  // Use LinkedHashSet to maintain insertion order
-                for (char c : currentNotes.replace(" ", "").toCharArray()) {
-                    if (c >= '1' && c <= '9') {
-                        noteSet.add(c);
-                    }
-                }
-                
-                // Add new notes or remove if already present
-                for (char c : note.toCharArray()) {
-                    if (c >= '1' && c <= '9') {
-                        if (noteSet.contains(c)) {
-                            noteSet.remove(c);  // Remove if already present
-                        } else {
-                            noteSet.add(c);     // Add new note
-                        }
-                    }
-                }
-
-                // Convert set back to string with spaces
-                StringBuilder updatedNotes = new StringBuilder();
-                for (Character noteChar : noteSet) {
-                    updatedNotes.append(noteChar).append(" ");  // Add space after each note
-                }
-
-                // Trim the last space and update the label
-                labels[currentlySelectedRow][currentlySelectedCol].setText(updatedNotes.toString().trim());
-            });
+            result.ifPresent(note -> labels[currentlySelectedRow][currentlySelectedCol].setText(note));
         }
     }
-
     public void undoMove() {
         if (!moveHistory.isEmpty()) {
             int[] lastMove = moveHistory.pop();
@@ -439,7 +405,6 @@ public class SudokuPanel{
             cells[currentlySelectedRow][currentlySelectedCol].setStyle("-fx-text-fill: red;");
             puzzle.getBoard()[currentlySelectedRow][currentlySelectedCol] = number;
             moveHistory.push(new int[]{currentlySelectedRow, currentlySelectedCol});
-            labels[currentlySelectedRow][currentlySelectedCol].setText("");
             mistake++;
             appUI.updateMistakeLabel(mistake);
             gameOver(mistake);
@@ -449,7 +414,6 @@ public class SudokuPanel{
             cells[currentlySelectedRow][currentlySelectedCol].setStyle("-fx-text-fill: blue;");
             puzzle.getBoard()[currentlySelectedRow][currentlySelectedCol] = number;
             moveHistory.push(new int[]{currentlySelectedRow, currentlySelectedCol});
-            labels[currentlySelectedRow][currentlySelectedCol].setText("");
             checkBoardFull();
             
         }

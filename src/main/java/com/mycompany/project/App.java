@@ -17,7 +17,8 @@ public class App extends Application {
         this.primaryStage = stage;
 
         menuScreen = new MenuScreen();
-        
+        gameScreen = new GameScreen();
+        roomScreen = new RoomScreen(primaryStage);
 
         primaryStage.setScene(menuScreen.getMenuScene());
         primaryStage.setTitle("Sudoku Game - Menu");
@@ -28,30 +29,20 @@ public class App extends Application {
     }
     private void handleScene(){
         menuScreen.setOnPlayOffline(() -> {
-            gameScreen = new GameScreen();
-            primaryStage.setScene(gameScreen.getGameScene());
+            primaryStage.setScene(gameScreen.getMenuScene());
             primaryStage.setTitle("Sudoku Game - Play Offline");
             gameScreen.startTimer();
-
-            gameScreen.setOnBack(() -> {
-                primaryStage.setScene(menuScreen.getMenuScene());
-                primaryStage.setTitle("Sudoku Game - Menu");
-            });
-            
         });
 
         menuScreen.setOnPlayOnline(() -> {
-            roomScreen = new RoomScreen(primaryStage);
             primaryStage.setScene(roomScreen.getRoomScene());
             primaryStage.setTitle("Sudoku Game - Play Online");
-            
-            roomScreen.setOnBack(() ->{
-                primaryStage.setScene(menuScreen.getMenuScene());
-                primaryStage.setTitle("Sudoku Game - Menu");
-            });
         });
 
-        
+        roomScreen.setOnBack(() ->{
+            primaryStage.setScene(menuScreen.getMenuScene());
+            primaryStage.setTitle("Sudoku Game - Menu");
+        });
     }
     public static void main(String[] args) {
             launch(args);
