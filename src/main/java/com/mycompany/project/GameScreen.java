@@ -25,12 +25,12 @@ import javafx.util.Duration;
 public class GameScreen {
     private String mode = "Medium";
 
-    private Button btnEasy;
+    private Button btnClassic;
     private Button btnMed;
-    private Button btnHard;
+    private Button btnAdvance;
     private Button btnEx;
     private Button btnMas;
-    private Button btnEXtr;
+    private Button btnPro;
 
     private Button btnPause;
     private Button btnUndo;
@@ -94,6 +94,12 @@ public class GameScreen {
 
         mainContainer = new AnchorPane(controlHeader, root, footerLbl);
         //mainContainer.setPadding(new Insets(20));
+
+        //chỉnh background
+        // String imageUrl = getClass().getResource("/background.jpg").toExternalForm();
+        // mainContainer.setStyle(
+        //     "-fx-background-image: url('/background.jpg');" +
+        //     "-fx-background-size: cover;" );
         
        // Anchor the controlHeader and hHeaderlbl
         AnchorPane.setTopAnchor(controlHeader, 10.0);
@@ -181,33 +187,33 @@ public class GameScreen {
         header.setAlignment(Pos.CENTER);
         HBox.setHgrow(header, Priority.ALWAYS);
         lblMode = new Label("Mode:");
-        btnEasy = new Button("Easy");
+        btnClassic = new Button("Classic");
         btnMed = new Button("Medium");
-        btnHard = new Button("Hard");
+        btnAdvance = new Button("Advance");
         btnEx = new Button("Expert");
         btnMas = new Button("Master");
-        btnEXtr = new Button("Extremely");
+        btnPro = new Button("Pro");
     
-        btnEasy.setPrefWidth(120);
+        btnClassic.setPrefWidth(120);
         btnMed.setPrefWidth(120);
-        btnHard.setPrefWidth(120);
+        btnAdvance.setPrefWidth(120);
         btnEx.setPrefWidth(120);
         btnMas.setPrefWidth(120);
-        btnEXtr.setPrefWidth(120);
+        btnPro.setPrefWidth(120);
     
         // Thiết lập nền màu và chữ màu xanh biển nhạt
         String buttonStyle = "-fx-background-color: rgba(234, 238, 244, 1.000); -fx-text-fill: darkblue; -fx-background-radius: 10;-fx-font-size: 18px;";
 
         lblMode.setStyle("-fx-text-fill: darkblue;-fx-font-size: 24px;");
         lblMode.setFont(Font.font(buttonStyle, FontWeight.BOLD, 13));
-        btnEasy.setStyle(buttonStyle);
+        btnClassic.setStyle(buttonStyle);
         btnMed.setStyle(buttonStyle);
-        btnHard.setStyle(buttonStyle);
+        btnAdvance.setStyle(buttonStyle);
         btnEx.setStyle(buttonStyle);
         btnMas.setStyle(buttonStyle);
-        btnEXtr.setStyle(buttonStyle);
+        btnPro.setStyle(buttonStyle);
     
-        header.getChildren().addAll(lblMode, btnEasy, btnMed, btnHard, btnEx, btnMas, btnEXtr);
+        header.getChildren().addAll(lblMode, btnClassic, btnMed, btnAdvance, btnEx, btnMas, btnPro);
         return header;
     }
     //Getter Setter
@@ -252,12 +258,12 @@ public class GameScreen {
     }
     //Handle Event
     private void handleButtonClick(){
-        btnEasy.setOnAction(event -> showConfirmationDialog("Easy"));
+        btnClassic.setOnAction(event -> showConfirmationDialog("Classic"));
         btnMed.setOnAction(event -> showConfirmationDialog("Medium"));
-        btnHard.setOnAction(event -> showConfirmationDialog("Hard"));
+        btnAdvance.setOnAction(event -> showConfirmationDialog("Advance"));
         btnEx.setOnAction(event -> showConfirmationDialog("Expert"));
         btnMas.setOnAction(event -> showConfirmationDialog("Master"));
-        btnEXtr.setOnAction(event -> showConfirmationDialog("Extremely"));
+        btnPro.setOnAction(event -> showConfirmationDialog("Pro"));
 
         btnDelete.setOnAction(event -> sudokuPanel.deleteValue());
         btnHint.setOnAction(event -> sudokuPanel.autoFill());

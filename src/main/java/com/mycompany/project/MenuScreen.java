@@ -39,7 +39,10 @@ public class MenuScreen {
         menuLayout = new VBox(10);
         menuLayout.getChildren().addAll(playOnlineButton, playOfflineButton, settingsButton);
         menuLayout.setPrefSize(300, 200);
-        menuLayout.setStyle("-fx-background-color: lightblue; -fx-padding: 10px; -fx-alignment: center");
+        menuLayout.setStyle("-fx-background-image: url('/sudoku6.jpg');" +
+            "-fx-background-size: cover;" +
+            "-fx-padding: 10px;" +
+            "-fx-alignment: center");
 
         // Tạo Scene chứa menuLayout
         scene = new Scene(menuLayout);
