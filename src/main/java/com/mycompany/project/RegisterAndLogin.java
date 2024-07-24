@@ -29,6 +29,8 @@ public class RegisterAndLogin {
     public RegisterAndLogin(){
         TabPane tabPane = new TabPane();
 
+        scene = new Scene(tabPane, 400, 300);
+        
         Tab registerTab = new Tab("Register");
         registerTab.setContent(createRegisterPane());
 
@@ -36,7 +38,9 @@ public class RegisterAndLogin {
         loginTab.setContent(createLoginPane());
 
         tabPane.getTabs().addAll(registerTab, loginTab);
-        scene = new Scene(tabPane, 400, 300);
+   
+
+
     }
      // Method to create the registration pane
      private GridPane createRegisterPane() {
@@ -72,6 +76,7 @@ public class RegisterAndLogin {
 
         registerPane.getChildren().addAll(username, usernameInput, emailLabel, emailInput, passwordLabel, passwordInput, rePasswordLabel, rePasswordInput, registerButton);
 
+        handleEnter(registerButton);
         return registerPane;
     }
 
@@ -99,6 +104,7 @@ public class RegisterAndLogin {
 
         loginPane.getChildren().addAll(loginEmailLabel, loginEmailInput, loginPasswordLabel, loginPasswordInput, loginButton);
 
+        handleEnter(loginButton);
         return loginPane;
     }
 
@@ -108,22 +114,38 @@ public class RegisterAndLogin {
         String password = passwordInput.getText();
         String userName = usernameInput.getText();
         String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
-
+    
         if (validateEmail(email) && validatePassword(password) && rePasswordInput.getText().equals(password)) {
-            try (Connection conn = MyConnection.getConnection();
-                 PreparedStatement stmt = conn.prepareStatement("INSERT INTO users (username, email, password) VALUES (?, ?, ?)")) {
-                stmt.setString(1, userName);
-                stmt.setString(2, email);
-                stmt.setString(3, hashedPassword);
-                stmt.executeUpdate();
-                showAlert(Alert.AlertType.INFORMATION, "Registration", "Registration Successful!");
+            try (Connection conn = MyConnection.getConnection()) {
+                // Check if the email already exists
+                String checkQuery = "SELECT COUNT(*) FROM users WHERE email = ?";
+                try (PreparedStatement checkStmt = conn.prepareStatement(checkQuery)) {
+                    checkStmt.setString(1, email);
+                    ResultSet rs = checkStmt.executeQuery();
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        showAlert(Alert.AlertType.ERROR, "Registration", "Account already exists with this email!");
+                        return;
+                    }
+                }
+    
+                // Insert new user
+                String insertQuery = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
+                try (PreparedStatement stmt = conn.prepareStatement(insertQuery)) {
+                    stmt.setString(1, userName);
+                    stmt.setString(2, email);
+                    stmt.setString(3, hashedPassword);
+                    stmt.executeUpdate();
+                    showAlert(Alert.AlertType.INFORMATION, "Registration", "Registration Successful!");
+                }
+    
             } catch (SQLException ex) {
                 ex.printStackTrace();
+                showAlert(Alert.AlertType.ERROR, "Registration", "An error occurred while registering. Please try again.");
             }
         } else {
             showAlert(Alert.AlertType.ERROR, "Registration", "Invalid email or password format!");
         }
-    }
+    }    
 
     // Method to handle login
     private void handleLogin(TextField loginEmailInput, PasswordField loginPasswordInput) {
@@ -151,6 +173,18 @@ public class RegisterAndLogin {
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
+    }
+
+    private void handleEnter(Button button){
+        scene.setOnKeyPressed(event ->{
+            switch (event.getCode()) {
+                case ENTER:
+                    button.fire();
+                    break;
+                default:
+                    break;
+            }
+        });
     }
 
     // Method to show alerts

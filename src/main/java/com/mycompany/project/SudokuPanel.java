@@ -131,8 +131,8 @@ public class SudokuPanel{
         textField.prefHeightProperty().bind(container.heightProperty());
     
         // Set fixed size for the StackPane to prevent resizing
-        container.setPrefSize(50, 50);
-        container.setMinSize(50, 50);
+        container.setPrefSize(60, 60);
+        container.setMinSize(60, 60);
     }
     private void updateCellColors() {
         // Reset all cell colors
