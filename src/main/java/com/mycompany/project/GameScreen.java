@@ -120,7 +120,7 @@ public class GameScreen {
         AnchorPane.setRightAnchor(footerLbl, 10.0);
             
 
-        scene = new Scene(mainContainer, 1200, 800);
+        scene = new Scene(mainContainer, 960, 720);
         scene.setFill(Color.WHITE);
 
         sudokuPanel.setAppUI(this);
@@ -197,15 +197,15 @@ public class GameScreen {
         btnMas = new Button("Master");
         btnEXtr = new Button("Extremely");
     
-        btnEasy.setPrefWidth(120);
-        btnMed.setPrefWidth(120);
-        btnHard.setPrefWidth(120);
-        btnEx.setPrefWidth(120);
-        btnMas.setPrefWidth(120);
-        btnEXtr.setPrefWidth(120);
+        btnEasy.setPrefWidth(110);
+        btnMed.setPrefWidth(110);
+        btnHard.setPrefWidth(110);
+        btnEx.setPrefWidth(110);
+        btnMas.setPrefWidth(110);
+        btnEXtr.setPrefWidth(110);
     
         // Thiết lập nền màu và chữ màu xanh biển nhạt
-        String buttonStyle = "-fx-background-color: rgba(234, 238, 244, 1.000); -fx-text-fill: darkblue; -fx-background-radius: 10;-fx-font-size: 18px;";
+        String buttonStyle = "-fx-background-color: rgba(234, 238, 244, 1.000); -fx-text-fill: darkblue; -fx-background-radius: 10;-fx-font-size: 16px;";
 
         lblMode.setStyle("-fx-text-fill: darkblue;-fx-font-size: 24px;");
         lblMode.setFont(Font.font(buttonStyle, FontWeight.BOLD, 13));

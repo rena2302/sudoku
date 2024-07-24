@@ -15,7 +15,6 @@ public class App extends Application {
     @Override
     public void start(Stage stage) {
         this.primaryStage = stage;
-        menuScreen = new MenuScreen();
         registerAndLogin = new RegisterAndLogin();
 
         primaryStage.setScene(registerAndLogin.getScene());
@@ -23,9 +22,17 @@ public class App extends Application {
         primaryStage.setResizable(true);
         primaryStage.show();
         
-        handleScene();
+        handleRegisterLoginScene();
     }
-    private void handleScene(){
+    private void handleRegisterLoginScene(){
+        registerAndLogin.setOnLoginSuccess(event -> {
+            menuScreen = new MenuScreen();
+            primaryStage.setScene(menuScreen.getMenuScene());
+            primaryStage.setTitle("Sudoku Game - Menu");
+            handleMenuScene();
+        });
+    }
+    private void handleMenuScene(){
         menuScreen.setOnPlayOffline(() -> {
             gameScreen = new GameScreen();
             primaryStage.setScene(gameScreen.getGameScene());
@@ -50,10 +57,7 @@ public class App extends Application {
             });
         });
 
-        registerAndLogin.setOnLoginSuccess(event -> {
-            primaryStage.setScene(menuScreen.getMenuScene());
-            primaryStage.setTitle("Sudoku Game - Menu");
-        });
+        
     }
     public static void main(String[] args) {
             launch(args);
