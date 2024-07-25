@@ -1,5 +1,7 @@
 package com.mycompany.project;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.NumberBinding;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
@@ -39,13 +41,21 @@ public class MenuScreen {
         menuLayout = new VBox(10);
         menuLayout.getChildren().addAll(playOnlineButton, playOfflineButton, settingsButton);
         menuLayout.setPrefSize(300, 200);
-        menuLayout.setStyle("-fx-background-image: url('/sudoku6.jpg');" +
+        menuLayout.setStyle("-fx-background-image: url('/pic1.jpg');" +
             "-fx-background-size: cover;" +
             "-fx-padding: 10px;" +
             "-fx-alignment: center");
 
         // Tạo Scene chứa menuLayout
         scene = new Scene(menuLayout);
+
+        // Bind font sizes to scene width
+        NumberBinding fontSizeBinding = Bindings.divide(scene.widthProperty(), 15);
+
+        // Apply the font size binding to buttons
+        playOnlineButton.styleProperty().bind(Bindings.concat("-fx-font-size: ", fontSizeBinding.asString(), ";"));
+        playOfflineButton.styleProperty().bind(Bindings.concat("-fx-font-size: ", fontSizeBinding.asString(), ";"));
+        settingsButton.styleProperty().bind(Bindings.concat("-fx-font-size: ", fontSizeBinding.asString(), ";"));
     }
 
     public void setOnPlayOffline(OnPlayOfflineListener listener) {

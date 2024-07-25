@@ -60,7 +60,7 @@ public class RoomScreen {
         vbox.getChildren().addAll(gridPane, hbox);
         vbox.setAlignment(Pos.CENTER);
 
-        String imageUrl = getClass().getResource("/snow.jpg").toExternalForm();
+        String imageUrl = getClass().getResource("/pic1.jpg").toExternalForm();
         vbox.setStyle(
             "-fx-background-image: url('/snow.jpg');" +
             "-fx-background-size: cover;"

@@ -7,19 +7,26 @@ import java.sql.SQLException;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 import com.mycompany.project.database.MyConnection;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.NumberBinding;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Labeled;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.GridPane;
-import org.mindrot.jbcrypt.BCrypt;
+import javafx.scene.layout.StackPane;
 
 
 public class RegisterAndLogin {
@@ -27,9 +34,14 @@ public class RegisterAndLogin {
     private Consumer<Void> onLoginSuccess;
 
     public RegisterAndLogin(){
+        
         TabPane tabPane = new TabPane();
 
-        scene = new Scene(tabPane, 400, 300);
+        StackPane root = new StackPane(tabPane);
+        root.setAlignment(Pos.CENTER);
+        root.setPadding(new Insets(10));
+
+        scene = new Scene(root, 400, 205);
         
         Tab registerTab = new Tab("Register");
         registerTab.setContent(createRegisterPane());
@@ -38,9 +50,29 @@ public class RegisterAndLogin {
         loginTab.setContent(createLoginPane());
 
         tabPane.getTabs().addAll(registerTab, loginTab);
-   
+        
+        
 
+        // StackPane content = new StackPane(tabPane);
+        // content.setAlignment(Pos.CENTER); // Center align the content
+        // content.setPadding(new Insets(10));
 
+        //scene = new Scene(root, 400, 203.0);
+
+        // Bind font sizes to scene width
+        NumberBinding fontSizeBinding = Bindings.divide(scene.widthProperty(), 40);
+
+        // Apply the font size binding to labels and text fields
+        for (Tab tab : tabPane.getTabs()) {
+            GridPane pane = (GridPane) tab.getContent();
+            pane.getChildren().forEach(node -> {
+                if (node instanceof Labeled) {
+                    ((Labeled) node).styleProperty().bind(Bindings.concat("-fx-font-size: ", fontSizeBinding.asString(), ";"));
+                } else if (node instanceof TextInputControl) {
+                    ((TextInputControl) node).styleProperty().bind(Bindings.concat("-fx-font-size: ", fontSizeBinding.asString(), ";"));
+                }
+            });
+        }
     }
      // Method to create the registration pane
      private GridPane createRegisterPane() {
@@ -48,6 +80,8 @@ public class RegisterAndLogin {
         registerPane.setPadding(new Insets(10, 10, 10, 10));
         registerPane.setVgap(8);
         registerPane.setHgap(10);
+        registerPane.setAlignment(Pos.CENTER);
+        registerPane.setStyle("-fx-background-image: url('/pic1.jpg')");
 
         Label username = new Label("Username:");
         GridPane.setConstraints(username, 0, 0);
@@ -75,7 +109,7 @@ public class RegisterAndLogin {
         registerButton.setOnAction(e -> handleRegister(usernameInput, emailInput, passwordInput, rePasswordInput));
 
         registerPane.getChildren().addAll(username, usernameInput, emailLabel, emailInput, passwordLabel, passwordInput, rePasswordLabel, rePasswordInput, registerButton);
-
+        
         handleEnter(registerButton);
         return registerPane;
     }
@@ -86,6 +120,8 @@ public class RegisterAndLogin {
         loginPane.setPadding(new Insets(10, 10, 10, 10));
         loginPane.setVgap(8);
         loginPane.setHgap(10);
+        loginPane.setAlignment(Pos.CENTER);
+        loginPane.setStyle("-fx-background-image: url('/pic1.jpg')");
 
         Label loginEmailLabel = new Label("Email:");
         GridPane.setConstraints(loginEmailLabel, 0, 0);
