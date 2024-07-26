@@ -26,6 +26,12 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
+import javafx.scene.image.Image;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 
@@ -51,14 +57,6 @@ public class RegisterAndLogin {
         loginTab.setContent(createLoginPane());
 
         tabPane.getTabs().addAll(registerTab, loginTab);
-        
-        
-
-        // StackPane content = new StackPane(tabPane);
-        // content.setAlignment(Pos.CENTER); // Center align the content
-        // content.setPadding(new Insets(10));
-
-        //scene = new Scene(root, 400, 203.0);
 
         // Bind font sizes to scene width
         NumberBinding fontSizeBinding = Bindings.divide(scene.widthProperty(), 40);
@@ -82,7 +80,11 @@ public class RegisterAndLogin {
         registerPane.setVgap(8);
         registerPane.setHgap(10);
         registerPane.setAlignment(Pos.CENTER);
-        registerPane.setStyle("-fx-background-image: url('/pic1.jpg')");
+        
+        Image backgroundImage = new Image("/images6.jpg");
+        BackgroundSize backgroundSize = new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, true, true, true, true);
+        BackgroundImage background = new BackgroundImage(backgroundImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, backgroundSize);
+        registerPane.setBackground(new Background(background));
 
         Label username = new Label("Username:");
         GridPane.setConstraints(username, 0, 0);
@@ -122,7 +124,11 @@ public class RegisterAndLogin {
         loginPane.setVgap(8);
         loginPane.setHgap(10);
         loginPane.setAlignment(Pos.CENTER);
-        loginPane.setStyle("-fx-background-image: url('/pic1.jpg')");
+        
+        Image backgroundImage = new Image("/images5.jpg");
+        BackgroundSize backgroundSize = new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, true, true, true, true);
+        BackgroundImage background = new BackgroundImage(backgroundImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, backgroundSize);
+        loginPane.setBackground(new Background(background));
 
         Label loginEmailLabel = new Label("Email:");
         GridPane.setConstraints(loginEmailLabel, 0, 0);
