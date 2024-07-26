@@ -16,16 +16,20 @@ public class MenuScreen {
     public interface OnPlayOnlineListener {
         void onPlayOnline();
     }
+    public interface OnRedcordListener {
+        void onRedcord();
+    }
     private Scene scene;
     private VBox menuLayout;
     private OnPlayOfflineListener onPlayOfflineListener;
     private OnPlayOnlineListener onPlayOnlineListener;
+    private OnRedcordListener onRedcordListener;
     public MenuScreen() {
         // Tạo các button
         Button howtoplaybtn=new Button("How to play");
         Button playOnlineButton = new Button("Play Online");
         Button playOfflineButton = new Button("Play Offline");
-        Button settingsButton = new Button("Settings");
+        Button viewScoreButton = new Button("Records");
 
         // Xử lý sự kiện khi nhấn các button (nếu cần)
         howtoplaybtn.setOnAction(event -> showHowToPlay());
@@ -44,11 +48,15 @@ public class MenuScreen {
                 onPlayOfflineListener.onPlayOffline();
             }
         });
-        settingsButton.setOnAction(e -> handleSettings());
+        viewScoreButton.setOnAction(event -> {
+            if(onRedcordListener != null){
+                onRedcordListener.onRedcord();
+            }
+        });
 
         // Sắp xếp các button vào một VBox
         menuLayout = new VBox(10);
-        menuLayout.getChildren().addAll(howtoplaybtn, playOnlineButton, playOfflineButton, settingsButton);
+        menuLayout.getChildren().addAll(howtoplaybtn, playOnlineButton, playOfflineButton, viewScoreButton);
         menuLayout.setPrefSize(300, 200);
         menuLayout.setStyle("-fx-background-image: url('/images.png');" +
             "-fx-background-size: cover;" +
@@ -65,7 +73,7 @@ public class MenuScreen {
          howtoplaybtn.styleProperty().bind(Bindings.concat("-fx-font-size: ", fontSizeBinding.asString(), ";"));
         playOnlineButton.styleProperty().bind(Bindings.concat("-fx-font-size: ", fontSizeBinding.asString(), ";"));
         playOfflineButton.styleProperty().bind(Bindings.concat("-fx-font-size: ", fontSizeBinding.asString(), ";"));
-        settingsButton.styleProperty().bind(Bindings.concat("-fx-font-size: ", fontSizeBinding.asString(), ";"));
+        viewScoreButton.styleProperty().bind(Bindings.concat("-fx-font-size: ", fontSizeBinding.asString(), ";"));
 
         // Bind spacing to scene height
         NumberBinding spacingBinding = Bindings.divide(scene.heightProperty(), 25);
@@ -90,13 +98,8 @@ public class MenuScreen {
         this.onPlayOnlineListener = listener;
     }
 
-    private void handleSettings() {
-        // Xử lý khi nhấn nút Settings
-        System.out.println("Settings button clicked");
-        // Điều hướng sang màn hình settings
-        // Ví dụ:
-        // SettingsScreen settingsScreen = new SettingsScreen();
-        // primaryStage.setScene(settingsScreen.getScene());
+    public void setOnRecord(OnRedcordListener listener){
+        this.onRedcordListener = listener;
     }
 
     // Method để trả về Scene của menu

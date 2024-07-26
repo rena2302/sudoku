@@ -4,7 +4,6 @@ import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.Camera;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -16,6 +15,7 @@ public class App extends Application {
     private MenuScreen menuScreen;
     private GameScreen gameScreen;
     private RoomScreen roomScreen;
+    private PlayerScoreScene playerScoreScene;
     private RegisterAndLogin registerAndLogin;
     @Override
     public void start(Stage stage) {
@@ -26,7 +26,7 @@ public class App extends Application {
         primaryStage.setTitle("Sudoku Game - Register Login");
         primaryStage.setResizable(true);
         primaryStage.show();
-        
+
         addSizeChangeListener();
         handleRegisterLoginScene();
     }
@@ -68,7 +68,6 @@ public class App extends Application {
             gameScreen.setOnBack(() -> {
                 primaryStage.setScene(menuScreen.getMenuScene());
                 primaryStage.setTitle("Sudoku Game - Menu");
-                centerWindow();
             });
         });
 
@@ -84,6 +83,12 @@ public class App extends Application {
             });
         });
 
+        menuScreen.setOnRecord(() ->{
+            playerScoreScene = new PlayerScoreScene(registerAndLogin.getEmailFromLocalStorage());
+            
+            primaryStage.setScene(playerScoreScene.getScene());
+            primaryStage.setTitle("Sudoku Game - Record");
+        });
         
     }
     public static void main(String[] args) {

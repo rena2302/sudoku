@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.function.Consumer;
+import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 
 import org.mindrot.jbcrypt.BCrypt;
@@ -196,6 +197,7 @@ public class RegisterAndLogin {
             if (rs.next()) {
                 String hasPassword = rs.getString("password");
                 if (BCrypt.checkpw(password, hasPassword)) {
+                    saveEmailToLocalStorage(email);
                     showAlert(Alert.AlertType.INFORMATION, "Login", "Login Successful!");
                     if (onLoginSuccess != null) {
                         onLoginSuccess.accept(null);
@@ -221,6 +223,24 @@ public class RegisterAndLogin {
                     break;
             }
         });
+    }
+
+    // Method to save email to LocalStorage
+    private void saveEmailToLocalStorage(String email) {
+        Preferences prefs = Preferences.userNodeForPackage(RegisterAndLogin.class);
+        prefs.put("userEmail", email);
+    }
+
+    // Method to get email from LocalStorage
+    public String getEmailFromLocalStorage() {
+        Preferences prefs = Preferences.userNodeForPackage(RegisterAndLogin.class);
+        return prefs.get("userEmail", null); // Trả về null nếu không tìm thấy email
+    }
+
+    // Method to remove email from LocalStorage
+    public void removeEmailFromLocalStorage() {
+        Preferences prefs = Preferences.userNodeForPackage(RegisterAndLogin.class);
+        prefs.remove("userEmail");
     }
 
     // Method to show alerts

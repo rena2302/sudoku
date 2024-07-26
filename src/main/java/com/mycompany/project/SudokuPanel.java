@@ -1,7 +1,13 @@
 package com.mycompany.project;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Stack;
+
+import com.mycompany.project.database.MyConnection;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
@@ -41,6 +47,8 @@ public class SudokuPanel{
     private int score;
     
     private SudokuPuzzle puzzle = generator.generateRandomSudoku(SudokuPuzzleType.NINEBYNINE, "Medium");
+
+    private RegisterAndLogin registerAndLogin = new RegisterAndLogin();
     
     //Setup
     public void newSudokuPuzzle(SudokuPuzzle puzzle) {
@@ -360,8 +368,27 @@ public class SudokuPanel{
         currentlySelectedRow = -1;
         appUI.rebuildInterface();
     }
+
+    public static void savePlayerScore(String userId, String mode, int score, int time) {
+        String insertScoreQuery = "INSERT INTO record (user_id, mode, score, time, date_completed) VALUES (?, ?, ?, ?, ?)";
+
+        try (Connection conn = MyConnection.getConnection();
+             PreparedStatement insertStmt = conn.prepareStatement(insertScoreQuery)){
+                 // Insert the new score
+                insertStmt.setString(1, userId);
+                insertStmt.setString(2, mode);
+                insertStmt.setInt(3, score);
+                insertStmt.setInt(4, time);
+                insertStmt.setDate(5, java.sql.Date.valueOf(LocalDate.now()));
+                insertStmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void checkBoardFull() {
         if (puzzle.boardFull()) {
+            savePlayerScore(registerAndLogin.getEmailFromLocalStorage(), appUI.getMode(), score, appUI.getSecondPassed());
             Alert alert = new Alert(AlertType.INFORMATION);
             alert.setTitle("Chúc mừng");
             alert.setHeaderText("Bạn đã chiến thắng!");
@@ -371,7 +398,7 @@ public class SudokuPanel{
             ButtonType exitButton = new ButtonType("Exit");
 
             alert.getButtonTypes().setAll(playAgainButton, exitButton);
-
+            
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == playAgainButton) {
                 playAgain(appUI.getMode());
