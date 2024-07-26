@@ -70,7 +70,7 @@ public class MenuScreen {
         NumberBinding fontSizeBinding = Bindings.divide(scene.widthProperty(), 25);
 
         // Apply the font size binding to buttons
-         howtoplaybtn.styleProperty().bind(Bindings.concat("-fx-font-size: ", fontSizeBinding.asString(), ";"));
+        howtoplaybtn.styleProperty().bind(Bindings.concat("-fx-font-size: ", fontSizeBinding.asString(), ";"));
         playOnlineButton.styleProperty().bind(Bindings.concat("-fx-font-size: ", fontSizeBinding.asString(), ";"));
         playOfflineButton.styleProperty().bind(Bindings.concat("-fx-font-size: ", fontSizeBinding.asString(), ";"));
         viewScoreButton.styleProperty().bind(Bindings.concat("-fx-font-size: ", fontSizeBinding.asString(), ";"));

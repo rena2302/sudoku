@@ -24,20 +24,20 @@ public class MyConnection {
     }
     public static List<PlayerScore> getPlayerScores(String userId) {
         List<PlayerScore> scores = new ArrayList<>();
-        String query = "SELECT mode, score, time, date_completed FROM record WHERE user_id = ?";
-
+        String query = "SELECT mode, score, time, date_completed FROM record where user_id = ?";
+    
         try (Connection conn = MyConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, userId);
             ResultSet rs = stmt.executeQuery();
-
+    
             while (rs.next()) {
                 String mode = rs.getString("mode");
                 int score = rs.getInt("score");
                 int time = rs.getInt("time");
                 String timeFormatted = updateTimerDisplay(time);
                 java.sql.Date dateCompleted = rs.getDate("date_completed");
-
+    
                 scores.add(new PlayerScore(mode, timeFormatted, score, dateCompleted));
             }
         } catch (SQLException e) {
@@ -45,6 +45,7 @@ public class MyConnection {
         }
         return scores;
     }
+    
     private static String updateTimerDisplay(int time) {
         int minutes = time / 60;
         int seconds = time % 60;

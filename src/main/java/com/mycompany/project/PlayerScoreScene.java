@@ -24,10 +24,12 @@ public class PlayerScoreScene {
 
     @SuppressWarnings("unchecked")
     private void setupTableColumns() {
+        table.getColumns().clear();
+
         TableColumn<PlayerScore, String> modeColumn = new TableColumn<>("Mode");
         modeColumn.setCellValueFactory(new PropertyValueFactory<>("mode"));
 
-        TableColumn<PlayerScore, Integer> timeColumn = new TableColumn<>("Time");
+        TableColumn<PlayerScore, String> timeColumn = new TableColumn<>("Time");
         timeColumn.setCellValueFactory(new PropertyValueFactory<>("time"));
 
         TableColumn<PlayerScore, Integer> scoreColumn = new TableColumn<>("Score");
@@ -36,7 +38,13 @@ public class PlayerScoreScene {
         TableColumn<PlayerScore, java.sql.Date> dateCompletedColumn = new TableColumn<>("Date Completed");
         dateCompletedColumn.setCellValueFactory(new PropertyValueFactory<>("dateCompleted"));
 
+        modeColumn.setPrefWidth(100);
+        timeColumn.setPrefWidth(100);
+        scoreColumn.setPrefWidth(100);
+        dateCompletedColumn.setPrefWidth(150);
+
         table.getColumns().addAll(modeColumn, timeColumn, scoreColumn, dateCompletedColumn);
+
     }
 
     private void loadPlayerScores(String userId) {
