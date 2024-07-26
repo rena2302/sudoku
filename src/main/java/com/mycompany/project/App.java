@@ -1,6 +1,11 @@
 package com.mycompany.project;
 
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.Camera;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 
@@ -22,8 +27,28 @@ public class App extends Application {
         primaryStage.setResizable(true);
         primaryStage.show();
         
+        addSizeChangeListener();
         handleRegisterLoginScene();
     }
+    
+    private void centerWindow() {
+        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+        primaryStage.setX((screenBounds.getWidth() - primaryStage.getWidth()) / 2);
+        primaryStage.setY((screenBounds.getHeight() - primaryStage.getHeight()) / 2);
+    }
+
+    private void addSizeChangeListener() {
+        ChangeListener<Number> sizeChangeListener = new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                centerWindow();
+            }
+        };
+
+        primaryStage.widthProperty().addListener(sizeChangeListener);
+        primaryStage.heightProperty().addListener(sizeChangeListener);
+    }
+
     private void handleRegisterLoginScene(){
         registerAndLogin.setOnLoginSuccess(event -> {
             menuScreen = new MenuScreen();
@@ -37,11 +62,13 @@ public class App extends Application {
             gameScreen = new GameScreen();
             primaryStage.setScene(gameScreen.getGameScene());
             primaryStage.setTitle("Sudoku Game - Play Offline");
+            primaryStage.setOnShowing(event -> centerWindow());
+            primaryStage.sizeToScene();
             gameScreen.startTimer();
-
             gameScreen.setOnBack(() -> {
                 primaryStage.setScene(menuScreen.getMenuScene());
                 primaryStage.setTitle("Sudoku Game - Menu");
+                centerWindow();
             });
         });
 
