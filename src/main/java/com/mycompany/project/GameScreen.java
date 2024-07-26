@@ -1,5 +1,6 @@
 package com.mycompany.project;
 
+
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.geometry.Insets;
@@ -27,7 +28,7 @@ public class GameScreen {
         void onBack();
     }
     private OnBackListener onBackListener;
-
+    
     private String mode = "Medium";
 
     private Button btnClassic;

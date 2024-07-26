@@ -190,7 +190,7 @@ public class RegisterAndLogin {
         String password = loginPasswordInput.getText();
 
         try (Connection conn = MyConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM users WHERE email = ?")) {
+             PreparedStatement stmt = conn.prepareStatement("SELECT username, password FROM users WHERE email = ?")) {
             stmt.setString(1, email);
             ResultSet rs = stmt.executeQuery();
 
@@ -198,6 +198,8 @@ public class RegisterAndLogin {
                 String hasPassword = rs.getString("password");
                 if (BCrypt.checkpw(password, hasPassword)) {
                     saveEmailToLocalStorage(email);
+                    String username = rs.getString("username");
+                    saveUsernameToLocalStorage(username);
                     showAlert(Alert.AlertType.INFORMATION, "Login", "Login Successful!");
                     if (onLoginSuccess != null) {
                         onLoginSuccess.accept(null);
@@ -224,20 +226,26 @@ public class RegisterAndLogin {
             }
         });
     }
+    private void saveUsernameToLocalStorage(String username) {
+        Preferences prefs = Preferences.userNodeForPackage(RegisterAndLogin.class);
+        prefs.put("username", username);
+    }
 
-    // Method to save email to LocalStorage
+    public String getUserNameFromLocalStorage(){
+        Preferences prefs = Preferences.userNodeForPackage(RegisterAndLogin.class);
+        return prefs.get("username", null);
+    }
     private void saveEmailToLocalStorage(String email) {
         Preferences prefs = Preferences.userNodeForPackage(RegisterAndLogin.class);
         prefs.put("userEmail", email);
     }
 
-    // Method to get email from LocalStorage
+    
     public String getEmailFromLocalStorage() {
         Preferences prefs = Preferences.userNodeForPackage(RegisterAndLogin.class);
         return prefs.get("userEmail", null); // Trả về null nếu không tìm thấy email
     }
 
-    // Method to remove email from LocalStorage
     public void removeEmailFromLocalStorage() {
         Preferences prefs = Preferences.userNodeForPackage(RegisterAndLogin.class);
         prefs.remove("userEmail");

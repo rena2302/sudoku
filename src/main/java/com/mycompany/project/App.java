@@ -6,11 +6,12 @@ import javafx.beans.value.ObservableValue;
 import javafx.geometry.Rectangle2D;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 
 
 public class App extends Application {
-    
+    private static App instance;
     private Stage primaryStage;
     private MenuScreen menuScreen;
     private GameScreen gameScreen;
@@ -19,6 +20,7 @@ public class App extends Application {
     private RegisterAndLogin registerAndLogin;
     @Override
     public void start(Stage stage) {
+        instance = this;
         this.primaryStage = stage;
         registerAndLogin = new RegisterAndLogin();
 
@@ -26,11 +28,16 @@ public class App extends Application {
         primaryStage.setTitle("Sudoku Game - Register Login");
         primaryStage.setResizable(true);
         primaryStage.show();
-
         addSizeChangeListener();
         handleRegisterLoginScene();
+
+        primaryStage.setOnCloseRequest(this::handleCloseRequest);
     }
-    
+
+    public static App getInstance() {
+        return instance;
+    }
+
     private void centerWindow() {
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
         primaryStage.setX((screenBounds.getWidth() - primaryStage.getWidth()) / 2);
@@ -90,6 +97,21 @@ public class App extends Application {
             primaryStage.setTitle("Sudoku Game - Record");
         });
         
+    }
+
+    private void handleCloseRequest(WindowEvent event) {
+        // Stop the server if it is running
+        if (roomScreen != null) {
+            roomScreen.stopServer();
+        }
+    }
+
+    public void startGame() {
+        // Logic to transition to the game screen
+        gameScreen = new GameScreen();
+        primaryStage.setScene(gameScreen.getGameScene());
+        primaryStage.setTitle("Sudoku Game - Online");
+        gameScreen.startTimer();
     }
     public static void main(String[] args) {
             launch(args);

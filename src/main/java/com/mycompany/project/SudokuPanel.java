@@ -8,6 +8,7 @@ import java.util.Random;
 import java.util.Stack;
 
 import com.mycompany.project.database.MyConnection;
+import com.mycompany.project.server.Client;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
@@ -49,6 +50,7 @@ public class SudokuPanel{
     private SudokuPuzzle puzzle = generator.generateRandomSudoku(SudokuPuzzleType.NINEBYNINE, "Medium");
 
     private RegisterAndLogin registerAndLogin = new RegisterAndLogin();
+
     
     //Setup
     public void newSudokuPuzzle(SudokuPuzzle puzzle) {
@@ -388,25 +390,31 @@ public class SudokuPanel{
 
     private void checkBoardFull() {
         if (puzzle.boardFull()) {
-            savePlayerScore(registerAndLogin.getEmailFromLocalStorage(), appUI.getMode(), score, appUI.getSecondPassed());
-            Alert alert = new Alert(AlertType.INFORMATION);
-            alert.setTitle("Chúc mừng");
-            alert.setHeaderText("Bạn đã chiến thắng!");
-            alert.setContentText("Bạn có muốn chơi lại không?");
-
-            ButtonType playAgainButton = new ButtonType("Play Again");
-            ButtonType exitButton = new ButtonType("Exit");
-
-            alert.getButtonTypes().setAll(playAgainButton, exitButton);
-            
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.isPresent() && result.get() == playAgainButton) {
-                playAgain(appUI.getMode());
+            if (Client.getClient() != null) {
+                // Notify server about game completion
+                Client.getClient().sendGameCompleted(registerAndLogin.getUserNameFromLocalStorage());
             } else {
-                System.exit(0);
+                // Handle offline game completion
+                savePlayerScore(registerAndLogin.getEmailFromLocalStorage(), appUI.getMode(), score, appUI.getSecondPassed());
+                Alert alert = new Alert(AlertType.INFORMATION);
+                alert.setTitle("Chúc mừng");
+                alert.setHeaderText("Bạn đã chiến thắng!");
+                alert.setContentText("Bạn có muốn chơi lại không?");
+        
+                ButtonType playAgainButton = new ButtonType("Play Again");
+                ButtonType exitButton = new ButtonType("Exit");
+        
+                alert.getButtonTypes().setAll(playAgainButton, exitButton);
+                    
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.isPresent() && result.get() == playAgainButton) {
+                    playAgain(appUI.getMode());
+                } else {
+                    System.exit(0);
+                }
             }
         }
-    }
+    }    
     private void handleKeyPress(KeyEvent event) {
         String number = event.getText();
         if (number.matches("[1-9]")) {
