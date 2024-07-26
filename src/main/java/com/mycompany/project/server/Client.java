@@ -14,19 +14,18 @@ public class Client {
     private static Client insClient;
     private Socket socket;
     private ObjectOutputStream out;
-
+    private ObjectInputStream in;
     public static Client getClient(){
         return insClient;
     }
-    public void connect(String serverAddress, int port) {
+    public void connect(String host, int port) {
         try {
-            insClient = this ;
-            socket = new Socket(serverAddress, port);
+            insClient = this;
+            socket = new Socket(host, port);
             out = new ObjectOutputStream(socket.getOutputStream());
-            out.flush();
-            System.out.println("Connected to server");
-
-            // Start listening for messages from the server
+            in = new ObjectInputStream(socket.getInputStream());
+            
+            // Start listening for messages
             new Thread(this::listenForMessages).start();
         } catch (IOException e) {
             e.printStackTrace();
@@ -35,9 +34,9 @@ public class Client {
 
     private void listenForMessages() {
         try {
-            ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
             while (true) {
                 String message = (String) in.readObject();
+                System.out.println(message);
                 if (message.equals("start_game")) {
                     // Transition to game screen
                     Platform.runLater(() -> App.getInstance().startGame());
@@ -52,9 +51,9 @@ public class Client {
         }
     }
 
-    public void sendGameCompleted(String playerName) {
+    public void sendMessage(String message) {
         try {
-            out.writeObject("completed_game:" + playerName);
+            out.writeObject(message);
             out.flush();
         } catch (IOException e) {
             e.printStackTrace();
@@ -74,6 +73,13 @@ public class Client {
         alert.setTitle("Game Update");
         alert.setHeaderText(null);
         alert.setContentText(message);
-        alert.showAndWait();
+        alert.showAndWait().ifPresent(response -> {
+            if (response == javafx.scene.control.ButtonType.OK) {
+                // Clear current data and generate new puzzle based on mode
+                Client.getClient().disconnect();
+                sendMessage("shutdown");
+                App.getInstance().returnToMainMenu();
+            }
+        });
     }
 }

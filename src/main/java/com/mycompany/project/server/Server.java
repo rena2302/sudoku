@@ -1,74 +1,62 @@
 package com.mycompany.project.server;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.*;
+import java.net.*;
+import java.util.*;
 
 import com.mycompany.project.App;
 
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+
 public class Server {
+    private static Server inServer;
     private ServerSocket serverSocket;
-    private List<Socket> clients;
+    private List<ClientHandler> clients;
 
     public void start() {
         clients = new ArrayList<>();
         try {
             serverSocket = new ServerSocket(12345);
             System.out.println("Server started on port 12345");
-
+            inServer = this;
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-                clients.add(clientSocket);
+                ClientHandler clientHandler = new ClientHandler(clientSocket);
+                clients.add(clientHandler);
                 System.out.println("Client connected: " + clientSocket.getInetAddress());
-                
+
                 // Start a new thread to handle the client
-                new Thread(() -> handleClient(clientSocket)).start();
+                new Thread(clientHandler).start();
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void handleClient(Socket clientSocket) {
+    public void shutdown() {
         try {
-            ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
-            //ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
-            
-            while (true) {
-                String message = (String) in.readObject();
-                if (message.startsWith("completed_game:")) {
-                    // Forward the completed game message to all clients
-                    notifyAllClients(message);
-                }
-                // Handle other messages if necessary
+            for (ClientHandler client : clients) {
+                client.close();
             }
-        } catch (IOException | ClassNotFoundException e) {
+            if (serverSocket != null && !serverSocket.isClosed()) {
+                serverSocket.close();
+            }
+        } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            // Clean up and remove the client
-            clients.remove(clientSocket);
-            try {
-                clientSocket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 
     private void notifyAllClients(String message) {
-        for (Socket client : clients) {
-            try {
-                ObjectOutputStream out = new ObjectOutputStream(client.getOutputStream());
-                out.writeObject(message);
-                out.flush();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        for (ClientHandler client : clients) {
+            client.sendMessage(message);
         }
+    }
+
+    public void notifyGameCompletion(String message) {
+        notifyAllClients(message);
+        String playerName = message.split(":")[1];
+        Platform.runLater(() -> showAlert(playerName + " has completed the game!"));
     }
 
     public boolean hasPlayers() {
@@ -77,25 +65,82 @@ public class Server {
 
     public void startGame() {
         // Notify all clients to start the game
-        for (Socket client : clients) {
-            try {
-                ObjectOutputStream out = new ObjectOutputStream(client.getOutputStream());
-                out.writeObject("start_game");
-                out.flush();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        for (ClientHandler client : clients) {
+            client.sendMessage("start_game");
         }
         System.out.println("Game started by the host.");
         // Implement game start logic for the host
         App.getInstance().startGame();
     }
 
-    public void stop() throws IOException {
-        for (Socket client : clients) {
-            client.close();
+    private void showAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Game Update");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait().ifPresent(response -> {
+            if (response == javafx.scene.control.ButtonType.OK) {
+                // Clear current data and generate new puzzle based on mode
+                Client.getClient().disconnect();
+                shutdown();
+                App.getInstance().returnToMainMenu();
+            }
+        });
+    }
+    
+    public static Server getServer(){
+        return inServer;
+    }
+    private class ClientHandler implements Runnable {
+        private Socket clientSocket;
+        private ObjectOutputStream out;
+        private ObjectInputStream in;
+
+        public ClientHandler(Socket socket) throws IOException {
+            this.clientSocket = socket;
+            this.out = new ObjectOutputStream(clientSocket.getOutputStream());
+            this.in = new ObjectInputStream(clientSocket.getInputStream());
         }
-        serverSocket.close();
+
+        @Override
+        public void run() {
+            try {
+                while (true) {
+                    String message = (String) in.readObject();
+                    System.out.println(message);
+                    if (message.startsWith("completed_game:")) {
+                        // Forward the completed game message to all clients
+                        notifyAllClients(message);
+                    } else if (message.equals("shutdown")){
+                        shutdown();
+                    }
+                    // Handle other messages if necessary
+                }
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            } finally {
+                close();
+            }
+        }
+
+        public void sendMessage(String message) {
+            try {
+                out.writeObject(message);
+                out.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public void close() {
+            try {
+                clientSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            clients.remove(this);
+        }
     }
 }
+
 

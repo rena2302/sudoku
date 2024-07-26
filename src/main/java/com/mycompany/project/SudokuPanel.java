@@ -9,6 +9,7 @@ import java.util.Stack;
 
 import com.mycompany.project.database.MyConnection;
 import com.mycompany.project.server.Client;
+import com.mycompany.project.server.Server;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
@@ -274,6 +275,7 @@ public class SudokuPanel{
                 puzzle.board[row][col] = value;
                 hint++;
                 appUI.updateHint(hint);
+                checkBoardFull();
                 return; 
             }
         }
@@ -392,8 +394,12 @@ public class SudokuPanel{
         if (puzzle.boardFull()) {
             if (Client.getClient() != null) {
                 // Notify server about game completion
-                Client.getClient().sendGameCompleted(registerAndLogin.getUserNameFromLocalStorage());
-            } else {
+                Client.getClient().sendMessage("completed_game:" + registerAndLogin.getUserNameFromLocalStorage());
+            
+            } else if (Server.getServer() != null){
+                Server.getServer().notifyGameCompletion("completed_game:" + registerAndLogin.getUserNameFromLocalStorage());
+            }
+            else {
                 // Handle offline game completion
                 savePlayerScore(registerAndLogin.getEmailFromLocalStorage(), appUI.getMode(), score, appUI.getSecondPassed());
                 Alert alert = new Alert(AlertType.INFORMATION);
@@ -433,6 +439,7 @@ public class SudokuPanel{
             showAlert("Thông báo", "Bạn không thể điền vào ô này", AlertType.WARNING);
             return;
         }
+        calculatorScore(number);
         //Check user make right choice or not
         if (!puzzle.getSolutionValue(currentlySelectedRow, currentlySelectedCol).equals(number)) {
             cells[currentlySelectedRow][currentlySelectedCol].setText(number);
@@ -449,9 +456,7 @@ public class SudokuPanel{
             puzzle.getBoard()[currentlySelectedRow][currentlySelectedCol] = number;
             moveHistory.push(new int[]{currentlySelectedRow, currentlySelectedCol});
             checkBoardFull();
-            
         }
-        calculatorScore(number);
         updateCellColors();
     }
 }

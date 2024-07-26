@@ -13,8 +13,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
-import java.io.IOException;
-
 import com.mycompany.project.server.Client;
 import com.mycompany.project.server.Server;
 
@@ -142,11 +140,7 @@ public class RoomScreen {
 
     public void stopServer() {
         if (server != null) {
-            try {
-                server.stop(); // Stop the server
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            server.shutdown();
         }
     }
 }

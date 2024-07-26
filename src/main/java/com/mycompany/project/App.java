@@ -23,7 +23,7 @@ public class App extends Application {
         instance = this;
         this.primaryStage = stage;
         registerAndLogin = new RegisterAndLogin();
-
+        
         primaryStage.setScene(registerAndLogin.getScene());
         primaryStage.setTitle("Sudoku Game - Register Login");
         primaryStage.setResizable(true);
@@ -73,8 +73,7 @@ public class App extends Application {
             primaryStage.sizeToScene();
             gameScreen.startTimer();
             gameScreen.setOnBack(() -> {
-                primaryStage.setScene(menuScreen.getMenuScene());
-                primaryStage.setTitle("Sudoku Game - Menu");
+                returnToMainMenu();
             });
         });
 
@@ -85,8 +84,7 @@ public class App extends Application {
             primaryStage.setTitle("Sudoku Game - Play Online");
 
             roomScreen.setOnBack(() ->{
-                primaryStage.setScene(menuScreen.getMenuScene());
-                primaryStage.setTitle("Sudoku Game - Menu");
+                returnToMainMenu();
             });
         });
 
@@ -112,6 +110,15 @@ public class App extends Application {
         primaryStage.setScene(gameScreen.getGameScene());
         primaryStage.setTitle("Sudoku Game - Online");
         gameScreen.startTimer();
+        gameScreen.setOnBack(() -> {
+            returnToMainMenu();
+            handleCloseRequest(null);
+        });
+    }
+
+    public void returnToMainMenu() {
+        primaryStage.setScene(menuScreen.getMenuScene());
+        primaryStage.setTitle("Sudoku Game - Menu");
     }
     public static void main(String[] args) {
             launch(args);
