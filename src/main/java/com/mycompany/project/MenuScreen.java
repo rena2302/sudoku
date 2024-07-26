@@ -58,7 +58,7 @@ public class MenuScreen {
         menuLayout = new VBox(10);
         menuLayout.getChildren().addAll(howtoplaybtn, playOnlineButton, playOfflineButton, viewScoreButton);
         menuLayout.setPrefSize(300, 200);
-        menuLayout.setStyle("-fx-background-image: url('/images.png');" +
+        menuLayout.setStyle("-fx-background-image: url('/images8.gif');" +
             "-fx-background-size: cover;" +
             "-fx-padding: 10px;" +
             "-fx-alignment: center");
