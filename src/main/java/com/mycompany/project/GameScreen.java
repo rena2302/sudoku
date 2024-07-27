@@ -65,6 +65,8 @@ public class GameScreen {
     private boolean timerIsRunning = false;
     private Timeline timer;
 
+    private Button selectedModeButton;
+
     private Scene scene;
 
     public GameScreen(){
@@ -266,12 +268,12 @@ public class GameScreen {
     }
     //Handle Event
     private void handleButtonClick(){
-        btnClassic.setOnAction(event -> showConfirmationDialog("Classic"));
-        btnMed.setOnAction(event -> showConfirmationDialog("Medium"));
-        btnAdvance.setOnAction(event -> showConfirmationDialog("Advance"));
-        btnEx.setOnAction(event -> showConfirmationDialog("Expert"));
-        btnMas.setOnAction(event -> showConfirmationDialog("Master"));
-        btnPro.setOnAction(event -> showConfirmationDialog("Pro"));
+        btnClassic.setOnAction(event -> handleModeButtonClick(btnClassic, "Classic"));
+        btnMed.setOnAction(event -> handleModeButtonClick(btnMed, "Medium"));
+        btnAdvance.setOnAction(event -> handleModeButtonClick(btnAdvance, "Advance"));
+        btnEx.setOnAction(event -> handleModeButtonClick(btnEx, "Expert"));
+        btnMas.setOnAction(event -> handleModeButtonClick(btnMas, "Master"));
+        btnPro.setOnAction(event -> handleModeButtonClick(btnPro, "Pro"));
 
         btnDelete.setOnAction(event -> sudokuPanel.deleteValue());
         btnHint.setOnAction(event -> sudokuPanel.autoFill());
@@ -286,6 +288,36 @@ public class GameScreen {
             }
         });
     }
+
+    private void handleModeButtonClick(Button clickedButton, String mode) {
+        // Update the mode
+        this.mode = mode;
+        System.out.println(mode);
+        rebuildMode(mode);
+
+        // Highlight the selected button
+        updateButtonStyles(clickedButton);
+
+        // Optional: Show confirmation dialog
+        showConfirmationDialog(mode);
+    }
+
+    private void updateButtonStyles(Button selectedButton) {
+        String selectedStyle = "-fx-background-color: rgba(100, 150, 255, 1.000); -fx-text-fill: white; -fx-background-radius: 10; -fx-font-size: 16px;";
+        String defaultStyle = "-fx-background-color: rgba(234, 238, 244, 1.000); -fx-text-fill: darkblue; -fx-background-radius: 10; -fx-font-size: 16px;";
+
+        // Reset style for all buttons
+        btnClassic.setStyle(defaultStyle);
+        btnMed.setStyle(defaultStyle);
+        btnAdvance.setStyle(defaultStyle);
+        btnEx.setStyle(defaultStyle);
+        btnMas.setStyle(defaultStyle);
+        btnPro.setStyle(defaultStyle);
+
+        // Apply style for the selected button
+        selectedButton.setStyle(selectedStyle);
+    }
+    
     private void showConfirmationDialog(String mode) {
         Alert alert = new Alert(AlertType.CONFIRMATION);
         alert.setTitle("Change Puzzle Mode");

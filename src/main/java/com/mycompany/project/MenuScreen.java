@@ -57,7 +57,7 @@ public class MenuScreen {
         // Sắp xếp các button vào một VBox
         menuLayout = new VBox(10);
         menuLayout.getChildren().addAll(howtoplaybtn, playOnlineButton, playOfflineButton, viewScoreButton);
-        menuLayout.setPrefSize(300, 200);
+        menuLayout.setPrefSize(400, 235);
         menuLayout.setStyle("-fx-background-image: url('/images8.gif');" +
             "-fx-background-size: cover;" +
             "-fx-padding: 10px;" +

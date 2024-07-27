@@ -1,5 +1,8 @@
 package com.mycompany.project;
 
+import com.mycompany.project.server.Client;
+import com.mycompany.project.server.Server;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -12,9 +15,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-
-import com.mycompany.project.server.Client;
-import com.mycompany.project.server.Server;
 
 public class RoomScreen {
     public interface onBackListener {
@@ -77,7 +77,7 @@ public class RoomScreen {
         vbox.setAlignment(Pos.CENTER);
         
         vbox.setStyle(
-            "-fx-background-image: url('/snow.jpg');" +
+            "-fx-background-image: url('/images10.gif');" +
             "-fx-background-size: cover;"
         );
         
