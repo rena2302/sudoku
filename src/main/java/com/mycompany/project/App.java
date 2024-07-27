@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.image.Image;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -24,6 +25,9 @@ public class App extends Application {
         this.primaryStage = stage;
         registerAndLogin = new RegisterAndLogin();
         
+        // Đặt biểu tượng cho ứng dụng
+        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/Icons/icon3.png")));
+
         primaryStage.setScene(registerAndLogin.getScene());
         primaryStage.setTitle("Sudoku Game - Register Login");
         primaryStage.setResizable(true);
