@@ -64,7 +64,7 @@ public class SudokuPuzzle {
 		return this.BOXHEIGHT;
 	}
 	
-	public String [] getValidValues() {
+	public String[] getValidValues() {
 		return this.VALIDVALUES;
 	}
     public String getValue(int row,int col) {

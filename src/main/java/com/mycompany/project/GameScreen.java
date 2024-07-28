@@ -133,6 +133,7 @@ public class GameScreen {
         sudokuPanel.setAppUI(this);
         initializeTimer();
         handleButtonClick();
+        sudokuPanel.playSound("/sounds/gamemusic.wav");
     }
     private VBox createControlPanel() {
         VBox controlPanel = new VBox(20);

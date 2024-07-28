@@ -34,7 +34,7 @@ public class SudokuGenerator {
 					switch (mode) 
 					{
 						case "Classic" -> 0.6666666666*(copy.getNumRows()*copy.getNumRows());
-						case "Medium" -> 0.9999*(copy.getNumRows()*copy.getNumRows());
+						case "Medium" -> 0.5555555555*(copy.getNumRows()*copy.getNumRows());
 						case "Hard" -> 0.4444444444*(copy.getNumRows()*copy.getNumRows());
 						case "Expert" -> 0.3333333333*(copy.getNumRows()*copy.getNumRows());
 						case "Master" -> 0.2222222222*(copy.getNumRows()*copy.getNumRows());

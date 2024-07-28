@@ -1,4 +1,5 @@
 package com.mycompany.project;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -27,8 +28,10 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+
 
 public class SudokuPanel{
     private static final int SIZE=9;
@@ -52,7 +55,7 @@ public class SudokuPanel{
 
     private RegisterAndLogin registerAndLogin = new RegisterAndLogin();
 
-    
+
     //Setup
     public void newSudokuPuzzle(SudokuPuzzle puzzle) {
 		this.puzzle = puzzle;
@@ -240,6 +243,18 @@ public class SudokuPanel{
         if(appUI != null){
             appUI.updateScore(score);
         }
+    }
+
+    public void playSound(String soundFile) {
+        // Đường dẫn đến file âm thanh
+        String soundPath = App.getInstance().getClass().getResource(soundFile).toExternalForm();
+
+        // Tạo đối tượng Media từ file âm thanh
+        javafx.scene.media.Media media = new javafx.scene.media.Media(soundPath);
+        MediaPlayer mediaPlayer = new MediaPlayer(media);
+
+        // Phát âm thanh
+        mediaPlayer.play();
     }
 
     //Event
