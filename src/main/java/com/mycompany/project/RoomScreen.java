@@ -12,7 +12,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -61,25 +60,6 @@ public class RoomScreen {
         gridPane.setHgap(20);
         gridPane.setVgap(20);
         gridPane.setPadding(new Insets(40));
-
-        // Thêm thuộc tính Hgrow và Vgrow để các thành phần tự động mở rộng
-        GridPane.setHgrow(btnCreateRoom, Priority.ALWAYS);
-        GridPane.setHgrow(btnJoinRoom, Priority.ALWAYS);
-        GridPane.setHgrow(txtServerAddress, Priority.ALWAYS);
-        GridPane.setHgrow(txtPort, Priority.ALWAYS);
-
-        // Đảm bảo rằng các thành phần UI có kích thước thay đổi cùng với cảnh
-        lblTitle.prefWidthProperty().bind(roomScene.widthProperty().multiply(0.5));
-        lblTitle.prefHeightProperty().bind(roomScene.heightProperty().multiply(0.15));
-
-        btnCreateRoom.prefWidthProperty().bind(roomScene.widthProperty().multiply(0.4));
-        btnCreateRoom.prefHeightProperty().bind(roomScene.heightProperty().multiply(0.1));
-        
-        btnJoinRoom.prefWidthProperty().bind(roomScene.widthProperty().multiply(0.4));
-        btnJoinRoom.prefHeightProperty().bind(roomScene.heightProperty().multiply(0.1));
-        
-        txtServerAddress.prefWidthProperty().bind(roomScene.widthProperty().multiply(0.4));
-        txtPort.prefWidthProperty().bind(roomScene.widthProperty().multiply(0.4));
         
         gridPane.add(lblTitle, 0, 0, 2, 1);
         gridPane.add(btnCreateRoom, 0, 1);
