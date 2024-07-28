@@ -222,7 +222,7 @@ public class SudokuPuzzle {
 			}
 		}
 	}
-	public void initializeCorrectBoard() {
+	private void initializeCorrectBoard() {
 		correctBoard = new Boolean[9][9];
 	
 		// Initialize the correctCells array to false
