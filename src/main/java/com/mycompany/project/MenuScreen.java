@@ -1,5 +1,7 @@
 package com.mycompany.project;
 
+import com.mycompany.project.util.SoundManager;
+
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.NumberBinding;
 import javafx.scene.Scene;
@@ -24,6 +26,7 @@ public class MenuScreen {
     private OnPlayOfflineListener onPlayOfflineListener;
     private OnPlayOnlineListener onPlayOnlineListener;
     private OnRedcordListener onRedcordListener;
+    private SoundManager soundManager = new SoundManager();
     public MenuScreen() {
         // Tạo các button
         Button howtoplaybtn=new Button("How to play");
@@ -32,23 +35,29 @@ public class MenuScreen {
         Button viewScoreButton = new Button("Records");
 
         // Xử lý sự kiện khi nhấn các button (nếu cần)
-        howtoplaybtn.setOnAction(event -> showHowToPlay());
+        howtoplaybtn.setOnAction(event -> {
+            soundManager.playSoundEffect("button.wav", 1.0);
+            showHowToPlay();});
         playOnlineButton.setOnAction(event -> {
+            soundManager.playSoundEffect("button.wav", 1.0);
             if(onPlayOnlineListener != null){
                 onPlayOnlineListener.onPlayOnline();
             }
         });
         playOnlineButton.setOnAction(event -> {
+            soundManager.playSoundEffect("button.wav", 1.0);
             if(onPlayOnlineListener != null){
                 onPlayOnlineListener.onPlayOnline();
             }
         });
         playOfflineButton.setOnAction(event -> {
+            soundManager.playSoundEffect("button.wav", 1.0);
             if (onPlayOfflineListener != null) {
                 onPlayOfflineListener.onPlayOffline();
             }
         });
         viewScoreButton.setOnAction(event -> {
+            soundManager.playSoundEffect("button.wav", 1.0);
             if(onRedcordListener != null){
                 onRedcordListener.onRedcord();
             }
@@ -87,7 +96,7 @@ public class MenuScreen {
         alert.setHeaderText(null);
         alert.setContentText("Sudoku is a logic-based, combinatorial number-placement puzzle. The objective is to fill a 9×9 grid with digits so that each column, each row, and each of the nine 3×3 subgrids that compose the grid (also called \"boxes\", \"blocks\", or \"regions\") contains all of the digits from 1 to 9. The puzzle setter provides a partially completed grid, which typically has a unique solution.");
 
-        alert.showAndWait();
+        alert.showAndWait().ifPresent(respon -> soundManager.playSoundEffect("button.wav", 1.0));;
     }
 
     public void setOnPlayOffline(OnPlayOfflineListener listener) {

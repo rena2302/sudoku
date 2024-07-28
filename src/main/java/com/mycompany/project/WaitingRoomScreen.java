@@ -1,6 +1,9 @@
 package com.mycompany.project;
 
+
 import com.mycompany.project.server.Server;
+import com.mycompany.project.util.SoundManager;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -16,6 +19,7 @@ public class WaitingRoomScreen {
     private Scene waitingRoomScene;
     private Server server; // Reference to the server instance
     private Button btnStartGame;
+    private SoundManager soundManager = new SoundManager();
 
     public WaitingRoomScreen(String serverAddress, int port, Server server) {
         this.server = server;
@@ -57,7 +61,7 @@ public class WaitingRoomScreen {
             alert.setTitle("Cannot Start Game");
             alert.setHeaderText(null);
             alert.setContentText("No players have joined the room yet. Please wait for at least one player to join.");
-            alert.showAndWait();
+            alert.showAndWait().ifPresent(respon -> soundManager.playSoundEffect("button.wav", 1.0));;
         }
     }
 }

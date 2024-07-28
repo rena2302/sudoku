@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import org.mindrot.jbcrypt.BCrypt;
 
 import com.mycompany.project.database.MyConnection;
+import com.mycompany.project.util.SoundManager;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.NumberBinding;
@@ -39,6 +40,7 @@ import javafx.scene.layout.StackPane;
 public class RegisterAndLogin {
     private Scene scene;
     private Consumer<Void> onLoginSuccess;
+    private SoundManager soundManager = new SoundManager();
 
     public RegisterAndLogin(){
         
@@ -263,7 +265,7 @@ public class RegisterAndLogin {
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(content);
-        alert.showAndWait();
+        alert.showAndWait().ifPresent(respon -> soundManager.playSoundEffect("button.wav", 1.0));;
     }
     private boolean validateEmail(String email) {
         String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";

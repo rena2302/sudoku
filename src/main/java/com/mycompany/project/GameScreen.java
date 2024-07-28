@@ -1,5 +1,6 @@
 package com.mycompany.project;
 
+import com.mycompany.project.util.SoundManager;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -64,10 +65,8 @@ public class GameScreen {
     private int secondsPassed = 0;
     private boolean timerIsRunning = false;
     private Timeline timer;
-
-    private Button selectedModeButton;
-
     private Scene scene;
+    private SoundManager soundManager = new SoundManager();
 
     public GameScreen(){
         suGrid = sudokuPanel.createSudokuGrid();
@@ -135,7 +134,7 @@ public class GameScreen {
         sudokuPanel.setAppUI(this);
         initializeTimer();
         handleButtonClick();
-        sudokuPanel.playSound("/sounds/gamemusic.wav");
+        soundManager.playBackgroundMusic("gamemusic.mp3", 0.2, false);
     }
     private VBox createControlPanel() {
         VBox controlPanel = new VBox(20);
@@ -265,6 +264,7 @@ public class GameScreen {
         return scene;
     }
     public void setOnBack(OnBackListener listener){
+        soundManager.stopBackgroundMusic();
         this.onBackListener = listener;
     }
     //Handle Event
@@ -276,21 +276,41 @@ public class GameScreen {
         btnMas.setOnAction(event -> handleModeButtonClick(btnMas, "Master"));
         btnPro.setOnAction(event -> handleModeButtonClick(btnPro, "Pro"));
 
-        btnDelete.setOnAction(event -> sudokuPanel.deleteValue());
-        btnHint.setOnAction(event -> sudokuPanel.autoFill());
-        btnNew.setOnAction(event -> sudokuPanel.playAgain(this.mode));
-        btnNote.setOnAction(event -> sudokuPanel.takeNote());
-        btnPause.setOnAction(event -> pauseAction());
-        btnUndo.setOnAction(event -> sudokuPanel.undoMove());
+        btnDelete.setOnAction(event -> {
+            soundManager.playSoundEffect("button.wav", 1.0);
+            sudokuPanel.deleteValue();
+        });
+        btnHint.setOnAction(event -> {
+            soundManager.playSoundEffect("hint.wav", 1.0);
+            sudokuPanel.autoFill();
+        });
+        btnNew.setOnAction(event -> {
+            soundManager.playSoundEffect("button.wav", 1.0);
+            sudokuPanel.playAgain(this.mode);
+        });
+        btnNote.setOnAction(event -> {
+            soundManager.playSoundEffect("button.wav", 1.0);
+            sudokuPanel.takeNote();
+        });
+        btnPause.setOnAction(event -> {
+            soundManager.playSoundEffect("button.wav", 1.0);
+            pauseAction(); 
+        });
+        btnUndo.setOnAction(event -> {
+            soundManager.playSoundEffect("button.wav", 1.0);
+            sudokuPanel.undoMove();
+        });
 
         btnBack.setOnAction(event -> {
             if(onBackListener != null){
+                soundManager.playSoundEffect("button.wav", 1.0);
                 onBackListener.onBack();
             }
         });
     }
 
     private void handleModeButtonClick(Button clickedButton, String mode) {
+        soundManager.playSoundEffect("button.wav", 1.0);
         // Update the mode
         this.mode = mode;
         System.out.println(mode);
@@ -326,6 +346,8 @@ public class GameScreen {
         alert.setContentText("Are you sure you want to change the puzzle mode? All current data will be lost.");
 
         alert.showAndWait().ifPresent(response -> {
+            soundManager.playSoundEffect("button.wav", 1.0);
+            soundManager.playSoundEffect("button.wav", 1.0);
             if (response == javafx.scene.control.ButtonType.OK) {
                 // Clear current data and generate new puzzle based on mode
                 this.mode = mode;
@@ -366,6 +388,7 @@ public class GameScreen {
 
         // Resume game on click anywhere
         pauseOverlay.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            soundManager.playSoundEffect("button.wav", 1.0);
             resumeTimer();
             root.setEffect(null);
             controlHeader.setEffect(null);

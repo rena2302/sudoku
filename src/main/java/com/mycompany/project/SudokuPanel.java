@@ -11,6 +11,7 @@ import java.util.Stack;
 import com.mycompany.project.database.MyConnection;
 import com.mycompany.project.server.Client;
 import com.mycompany.project.server.Server;
+import com.mycompany.project.util.SoundManager;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
@@ -28,7 +29,6 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
-import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
@@ -54,6 +54,8 @@ public class SudokuPanel{
     private SudokuPuzzle puzzle = generator.generateRandomSudoku(SudokuPuzzleType.NINEBYNINE, "Medium");
 
     private RegisterAndLogin registerAndLogin = new RegisterAndLogin();
+
+    private SoundManager soundManager = new SoundManager();
 
 
     //Setup
@@ -245,18 +247,6 @@ public class SudokuPanel{
         }
     }
 
-    public void playSound(String soundFile) {
-        // Đường dẫn đến file âm thanh
-        String soundPath = App.getInstance().getClass().getResource(soundFile).toExternalForm();
-
-        // Tạo đối tượng Media từ file âm thanh
-        javafx.scene.media.Media media = new javafx.scene.media.Media(soundPath);
-        MediaPlayer mediaPlayer = new MediaPlayer(media);
-
-        // Phát âm thanh
-        mediaPlayer.play();
-    }
-
     //Event
     public void autoFill(){
         Stack<int[]> emptySlots = puzzle.emptySlot();
@@ -437,6 +427,7 @@ public class SudokuPanel{
         }
     }    
     private void handleKeyPress(KeyEvent event) {
+        soundManager.playSoundEffect("button.wav", 1.0);
         String number = event.getText();
         if (number.matches("[1-9]")) {
             event.consume();
@@ -457,6 +448,7 @@ public class SudokuPanel{
         calculatorScore(number);
         //Check user make right choice or not
         if (!puzzle.getSolutionValue(currentlySelectedRow, currentlySelectedCol).equals(number)) {
+            soundManager.playSoundEffect("wrong.wav", 1.0);
             cells[currentlySelectedRow][currentlySelectedCol].setText(number);
             cells[currentlySelectedRow][currentlySelectedCol].setStyle("-fx-text-fill: red;");
             puzzle.getBoard()[currentlySelectedRow][currentlySelectedCol] = number;
@@ -466,6 +458,7 @@ public class SudokuPanel{
             gameOver(mistake);
         }
         else{
+            soundManager.playSoundEffect("correct.wav", 1.0);
             cells[currentlySelectedRow][currentlySelectedCol].setText(number);
             cells[currentlySelectedRow][currentlySelectedCol].setStyle("-fx-text-fill: blue;");
             puzzle.getBoard()[currentlySelectedRow][currentlySelectedCol] = number;

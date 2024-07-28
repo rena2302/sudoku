@@ -14,7 +14,7 @@
             "request": "launch",
             "mainClass": "com.mycompany.project.App",
             "projectName": "Project",
-            "vmArgs": "--module-path \"C:/Program Files/Java/javafx-sdk-22.0.2/lib\" --add-modules javafx.controls,javafx.fxml"
+            "vmArgs": "--module-path \"C:/Program Files/Java/javafx-sdk-22.0.2/lib\" --add-modules javafx.controls,javafx.fxml,javafx.media"
         }
     ]
   }

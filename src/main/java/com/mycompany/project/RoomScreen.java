@@ -2,6 +2,7 @@ package com.mycompany.project;
 
 import com.mycompany.project.server.Client;
 import com.mycompany.project.server.Server;
+import com.mycompany.project.util.SoundManager;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -32,6 +33,7 @@ public class RoomScreen {
     private onBackListener onBackListener;
     private Server server; // Instance of the server
     private Client client; // Instance of the client
+    private SoundManager soundManager = new SoundManager();
 
     public RoomScreen() {
         initializeComponents();
@@ -112,10 +114,12 @@ public class RoomScreen {
         });
         
         btnCreateRoom.setOnAction(event -> {
+            soundManager.playSoundEffect("button.wav", 1.0);
             createRoom();
         });
         
         btnJoinRoom.setOnAction(event -> {
+            soundManager.playSoundEffect("button.wav", 1.0);
             joinRoom();
         });
     }
