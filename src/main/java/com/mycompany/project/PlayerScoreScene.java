@@ -3,10 +3,12 @@ package com.mycompany.project;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.util.List;
@@ -86,7 +88,15 @@ public class PlayerScoreScene {
     }
 
     public Scene getScene() {
-        VBox vbox = new VBox(table);
-        return new Scene(vbox);
+         Button backButton = new Button("Back to Menu");
+        backButton.setOnAction(e -> App.getInstance().returnToMainMenu());
+
+        VBox vbox = new VBox(10); // Add spacing between elements
+        HBox hbox = new HBox(backButton); // Add the button to an HBox
+        hbox.setStyle("-fx-padding: 10;"); // Optional padding style for better layout
+
+        vbox.getChildren().addAll(hbox, table);
+
+        return new Scene(vbox); // Adjust scene size as needed
     }
 }
